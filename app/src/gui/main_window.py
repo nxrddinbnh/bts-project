@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame
-from PyQt6.QtGui import QIcon
+from PyQt6.QtGui import QIcon, QFontDatabase
 from constants import BG_300, BG_200
 from gui.sidebar import Sidebar
 from modules.brightness import Brightness
@@ -9,6 +9,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.load_fonts()  
         self.setup_ui()
         self.create_bentogrid()
 
@@ -69,3 +70,22 @@ class MainWindow(QMainWindow):
         layout.setRowStretch(1, 2)
 
         central_widget.setLayout(layout)
+
+    def load_fonts(self):
+        """Load necessary fonts for the application"""
+        try:
+            fonts = [
+                ("assets/fonts/Lato-Black.ttf", "Lato Black"),
+                ("assets/fonts/Lato-Bold.ttf", "Lato Bold"),
+                ("assets/fonts/Lato-Regular.ttf", "Lato Regular"),
+                ("assets/fonts/Lato-Light.ttf", "Lato Light"),
+                ("assets/fonts/Lato-Thin.ttf", "Lato Thin"),
+            ]
+
+            for font_path, font_name in fonts:
+                font_id = QFontDatabase.addApplicationFont(font_path)
+                if font_id < 0: 
+                    print(f"Error: Could not load '{font_name}' font.")
+
+        except Exception as e:
+            print(f"An error occurred while loading fonts: {e}")

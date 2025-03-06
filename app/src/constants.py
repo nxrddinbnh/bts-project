@@ -9,12 +9,12 @@ BG_200 = "#1B2435"
 BG_300 = "#131529"
 BG_OPACITY = "rgba(40, 49, 66, 0.3)"
 TEXT_100 = "#FFFFFF"
-TEXT_200 = "#D8D8D8"
+TEXT_200 = "#C0C0C0"
 
 # FONTS
-FONT_TITLE = QFont("Lato", 10, QFont.Weight.Medium)
+FONT_TITLE = QFont("Lato", 10, 400)
 FONT_BODY = QFont("Lato", 8, QFont.Weight.Normal)
-FONT_VALUES = QFont("Lato", 20, QFont.Weight.Bold)
+FONT_VALUES = QFont("Lato", 25, QFont.Weight.Bold)
 
 # RADIUS & PADDING
 RADIUS_100 = 10
@@ -22,5 +22,5 @@ RADIUS_200 = 20
 PADD_100 = 5
 PADD_200 = 10
 
-# DIRECTIONS
+# DIRECTIONSs
 DIRECTIONS = ["north", "south", "east", "west"]

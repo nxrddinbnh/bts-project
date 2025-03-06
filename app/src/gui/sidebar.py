@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QPushButton, QSpacerItem, QSizePolicy, QLabel, QGridLayout
 from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QIcon
-from constants import BG_100, BG_200, PRIMARY, PADD_100, RADIUS_100, RADIUS_200
+from constants import BG_100, BG_200, PRIMARY, PADD_100, RADIUS_100, RADIUS_200, FONT_BODY
 
 class Sidebar(QFrame):
     def __init__(self):
@@ -84,6 +84,7 @@ class Sidebar(QFrame):
             text_label.setVisible(self.is_expanded)
             text_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
             text_label.setStyleSheet("background-color: none; padding: 0px;" if not hide_text else "background-color: none; color: transparent;") # Align the hamb icon with the other icons
+            text_label.setFont(FONT_BODY)
             button_layout.addWidget(text_label)
             button.text_label = text_label
 
