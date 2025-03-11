@@ -22,7 +22,7 @@ class Brightness(QFrame):
         # Title label
         title_label = QLabel("brightness".upper())
         title_label.setFont(FONT_TITLE)
-        title_label.setStyleSheet("padding-left: 0;")
+        title_label.setStyleSheet("padding-left: 0; color: white;")
         title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
         main_layout.addWidget(title_label)
 
@@ -66,7 +66,7 @@ class Brightness(QFrame):
         frame.setLayout(layout)
         return frame
 
-    def create_label(self, text, font, color=None):
+    def create_label(self, text, font, color="white"):
         """
         Creates a QLabel with the specified text and font.
         

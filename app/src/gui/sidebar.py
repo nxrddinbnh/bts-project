@@ -75,7 +75,7 @@ class Sidebar(QFrame):
         # Icon label
         icon_label = QLabel()
         icon_label.setPixmap(QIcon(f"assets/icons/{icon_file}").pixmap(QSize(18, 18)))
-        icon_label.setStyleSheet("padding: 0 5px; background-color: transparent;")
+        icon_label.setStyleSheet("padding: 0 5px; background-color: transparent; color: white;")
         button_layout.addWidget(icon_label)
 
         # Text label
@@ -83,7 +83,7 @@ class Sidebar(QFrame):
             text_label = QLabel(text)
             text_label.setVisible(self.is_expanded)
             text_label.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
-            text_label.setStyleSheet("background-color: none; padding: 0px;" if not hide_text else "background-color: none; color: transparent;") # Align the hamb icon with the other icons
+            text_label.setStyleSheet("background-color: none; padding: 0px; color: white;" if not hide_text else "background-color: none; color: transparent;") # Align the hamb icon with the other icons
             text_label.setFont(FONT_BODY)
             button_layout.addWidget(text_label)
             button.text_label = text_label
