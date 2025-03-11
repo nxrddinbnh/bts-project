@@ -3,12 +3,15 @@ from PyQt6.QtGui import QIcon, QFontDatabase
 from constants import BG_300, BG_200
 from gui.sidebar import Sidebar
 from modules.brightness import Brightness
+from services.serial_com import SerialCommunication
 
 class MainWindow(QMainWindow):
     BRIGHTNESS_VALUES = {"north": 211, "south": 210, "east": 194, "west": 218, "average": 208}
 
     def __init__(self):
         super().__init__()
+        self.serial_com = SerialCommunication()
+        self.serial_com.connect()
         self.load_fonts()  
         self.setup_ui()
         self.create_bentogrid()
@@ -16,7 +19,7 @@ class MainWindow(QMainWindow):
     def setup_ui(self):
         """Configure the UI layout of the main window"""
         self.setWindowTitle("")
-
+                                                                                          
         width, height = 1280, 720
         screen_geometry = self.screen().geometry()
         x = (screen_geometry.width() - width) // 2
