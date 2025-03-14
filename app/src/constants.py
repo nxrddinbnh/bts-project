@@ -22,9 +22,6 @@ RADIUS_200 = 20
 PADD_100 = 5
 PADD_200 = 10
 
-# DIRECTIONS
-DIRECTIONS = ["north", "south", "east", "west"]
-
 # SERIAL COMMANDS
 CMD_LIGHT = 0x45
 CMD_MOTOR_ELEV = 0x4A
@@ -32,3 +29,38 @@ CMD_MOTOR_AZIM = 0x4B
 CMD_CORRECT = 0x4C
 REQUEST_DATA = 0x52
 END_FRAME = 0x0D
+
+# VARIABLES FOR SOLAR PANEL CONTROL DATA
+DATA_VARIABLES_NAME = [
+    "lum_east",         # luminosity east
+    "lum_west",         # luminosity west
+    "lum_north",        # luminosity north
+    "lum_south",        # luminosity south
+    "lum_avg",          # average luminosity
+    "lum_dev_az",       # luminosity deviation azimuth
+    "lum_dev_el",       # luminosity deviation elevation
+
+    "volt_panel",       # solar panel voltage
+    "volt_batt",        # battery voltage
+    "curr_panel",       # solar panel current
+    "curr_batt",        # battery current
+    "charge",           # charge indicator
+    "full_charge",      # full charge indicator
+    "discharge",        # discharge indicator
+
+    "light_on",         # lighting indicator
+    "light_lvl",        # lighting level
+
+    "curr_m1",          # motor 1 current
+    "curr_m2",          # motor 2 current
+    "overload_el",      # overload indicator elevation
+    "overload_az",      # overload indicator azimuth
+    "moving",           # movement indicator (0 = stopped)
+    "angle_az",         # azimuth angle
+    "angle_el",         # elevation angle
+    "limit",            # stop indicator
+
+    "correction_on",    # automatic correction mode (0 = off, 1 = on)
+    "correction_int",   # correction interval (minutes)
+    "correction_thr"   # luminosity deviation threshold for correction
+]

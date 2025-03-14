@@ -1,17 +1,19 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame
+from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QPushButton
 from PyQt6.QtGui import QIcon, QFontDatabase
-from constants import BG_300, BG_200
+from constants import BG_300, BG_200, REQUEST_DATA
 from gui.sidebar import Sidebar
 from modules.brightness import Brightness
 from services.serial_com import SerialCommunication
 
 class MainWindow(QMainWindow):
-    BRIGHTNESS_VALUES = {"north": 211, "south": 210, "east": 194, "west": 218, "average": 208}
-
     def __init__(self):
+        """Initialize the main window and its components"""
         super().__init__()
         self.serial_com = SerialCommunication()
         self.serial_com.connect()
+
+        self.brightness_values = self.serial_com.receive_data()
+
         self.load_fonts()  
         self.setup_ui()
         self.create_bentogrid()
@@ -39,7 +41,7 @@ class MainWindow(QMainWindow):
         layout.setContentsMargins(10, 10, 10, 10)
 
         sidebar = Sidebar()
-        brightness = Brightness(self.BRIGHTNESS_VALUES)
+        self.brightness = Brightness(self.brightness_values)
 
         def create_block():
             block = QFrame()
@@ -53,14 +55,20 @@ class MainWindow(QMainWindow):
         block5 = create_block()
         block6 = create_block()
 
+        # Test button for sending REQUEST_DATA
+        # test_button = QPushButton("Send REQUEST_DATA")
+        # test_button.setStyleSheet("background-color: #3498db; color: white; padding: 10px; border-radius: 10px;")
+        # test_button.clicked.connect(self.test_send_command)  # Conectamos al método de actualización
+
         # Add widgets to the grid layout
         layout.addWidget(sidebar, 0, 0, 2, 1)
-        layout.addWidget(brightness, 0, 1, 1, 3)
+        layout.addWidget(self.brightness, 0, 1, 1, 3)
         layout.addWidget(block2, 0, 4, 1, 2)
         layout.addWidget(block3, 1, 1, 1, 1)
         layout.addWidget(block4, 1, 2, 1, 1)
         layout.addWidget(block5, 1, 3, 1, 2)
         layout.addWidget(block6, 1, 5, 1, 1)
+        # layout.addWidget(test_button, 2, 2, 1, 2) # test button
 
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(1, 3)
@@ -92,3 +100,20 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             print(f"An error occurred while loading fonts: {e}")
+
+    # def test_send_command(self):
+    #     """Test: send REQUEST_DATA """
+    #     try:
+    #         if self.serial_com and self.serial_com.serial_connection:
+    #             self.serial_com.send_command(REQUEST_DATA)
+    #             new_data = self.serial_com.receive_data()
+                
+    #             if new_data:
+    #                 print(f"New data received: {new_data}")
+    #                 self.brightness.update_values(new_data)
+    #             else:
+    #                 print("No new data received")
+    #         else:
+    #             print("Error: no connection")
+    #     except Exception as e:
+    #         print(f"Error send command test: {e}")
