@@ -43,7 +43,7 @@ class MainWindow(QMainWindow):
 
         sidebar = Sidebar()
         self.brightness = Brightness(self.brightness_values)
-        lighting = Lighting()
+        lighting = Lighting(self.serial_com)
 
         def create_block():
             block = QFrame()
@@ -56,10 +56,12 @@ class MainWindow(QMainWindow):
         block5 = create_block()
         block6 = create_block()
 
-        # Test button for sending REQUEST_DATA
-        # test_button = QPushButton("Send REQUEST_DATA")
-        # test_button.setStyleSheet("background-color: #3498db; color: white; padding: 10px; border-radius: 10px;")
-        # test_button.clicked.connect(self.test_send_command)  # Conectamos al método de actualización
+        # # Create "Request Data" button
+        # self.request_data_button = QPushButton("Request Data")
+        # self.request_data_button.setStyleSheet(
+        #     "background-color: #007ACC; color: white; border-radius: 10px; padding: 10px; font-size: 16px;"
+        # )
+        # self.request_data_button.clicked.connect(self.request_data)
 
         # Add widgets to the grid layout
         layout.addWidget(sidebar, 0, 0, 2, 1)
@@ -69,7 +71,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(block4, 1, 2, 1, 1)
         layout.addWidget(block5, 1, 3, 1, 2)
         layout.addWidget(block6, 1, 5, 1, 1)
-        # layout.addWidget(test_button, 2, 2, 1, 2) # test button
+        # layout.addWidget(self.request_data_button, 2, 0, 1, 6)  # Add button to layout
 
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(1, 3)
@@ -102,19 +104,7 @@ class MainWindow(QMainWindow):
         except Exception as e:
             print(f"An error occurred while loading fonts: {e}")
 
-    # def test_send_command(self):
-    #     """Test: send REQUEST_DATA """
-    #     try:
-    #         if self.serial_com and self.serial_com.serial_connection:
-    #             self.serial_com.send_command(REQUEST_DATA)
-    #             new_data = self.serial_com.receive_data()
-                
-    #             if new_data:
-    #                 print(f"New data received: {new_data}")
-    #                 self.brightness.update_values(new_data)
-    #             else:
-    #                 print("No new data received")
-    #         else:
-    #             print("Error: no connection")
-    #     except Exception as e:
-    #         print(f"Error send command test: {e}")
+    # def request_data(self):
+    #     """Send REQUEST_DATA command and handle the response"""
+    #     response = self.serial_com.send_command(REQUEST_DATA)
+    #     print(f"Received response: {response}")

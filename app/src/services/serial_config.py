@@ -2,7 +2,7 @@ import serial.tools.list_ports
 
 class SerialConfig:
     """A class to manage serial connection settings dynamically"""
-    def __init__(self, port=None, baudrate=9600, timeout=1):
+    def __init__(self, baudrate=9600, timeout=1):
         """
         Initialize the serial configuration with default values
 
@@ -10,9 +10,9 @@ class SerialConfig:
         :param baudrate: Baud rate for the serial connection
         :param timeout: Timeout in seconds for serial communication
         """
-        self._port = port if port else self.find_highest_port()
         self._baudrate = baudrate
         self._timeout = timeout
+        self._port = self.find_highest_port()
 
     def find_highest_port(self):
         """
@@ -20,25 +20,24 @@ class SerialConfig:
 
         :return: The highest numbered serial port
         """
-        ports = [port.device for port in serial.tools.list_ports.comports()]
-        if not ports:
-            raise Exception("No available serial ports found")
-        
-        try:
-            highest_port = max(ports, key=lambda p: int(''.join(filter(str.isdigit, p))) if any(c.isdigit() for c in p) else 0)
-        except ValueError:
-            highest_port = ports[-1]  # If no numerical sorting possible, take the last one
+        available_ports = []
 
-        print(f"Auto-detected highest available port: {highest_port}")
-        return highest_port
+        # COM port routing from 1 to 256
+        for i in range(1, 257):
+            port = f"COM{i}"
+            try:
+                s = serial.Serial(port)
+                s.close()
+                available_ports.append(port)
+            except (OSError, serial.SerialException):
+                pass
 
-    def set_port(self, port):
-        """
-        Update the serial port name
-
-        :param port: New serial port name
-        """
-        self._port = port
+        # Find the highest COM port
+        if available_ports:
+            highest_port = max(available_ports, key=lambda p: int(p.replace("COM", "")))
+            return highest_port
+        else:
+            return None
 
     def set_baudrate(self, baudrate):
         """
@@ -55,6 +54,14 @@ class SerialConfig:
         :param timeout: Timeout in seconds
         """
         self._timeout = timeout
+
+    def set_port(self, port):
+        """
+        Update the serial port name
+
+        :param port: New serial port name
+        """
+        self._port = port
 
     def get_config(self):
         """

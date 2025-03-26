@@ -1,7 +1,7 @@
 import serial
 import time
 from services.serial_config import SerialConfig
-from constants import END_FRAME, DATA_VARIABLES_NAME
+from constants import DATA_VARIABLES_NAME, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 from modules.brightness import Brightness
 
 class SerialCommunication:
@@ -22,15 +22,22 @@ class SerialCommunication:
 
     def connect(self):
         """Establishes a connection to the serial port"""
-        try:
-            self.serial_connection = serial.Serial(
-                port = self.port,
-                baudrate = self.baudrate,
-                timeout = self.timeout
-            )
-            print(f"Connected to {self.port} at {self.baudrate} baud")
-        except serial.SerialException as e:
-            raise Exception(f"Failed to connect to {self.port}: {e}")
+        if not self.port:
+            print("No available serial port found")
+            return
+
+        if self.serial_connection is None or not self.serial_connection.is_open:
+            try:
+                self.serial_connection = serial.Serial(
+                    port = self.port,
+                    baudrate = self.baudrate,
+                    timeout = 10
+                )
+                print(f"Connected to {self.port} at {self.baudrate} baud")
+            except serial.SerialException as e:
+                raise Exception(f"Failed to connect to {self.port}: {e}")
+        else:
+            print(f"Already connected to {self.port}")
         
     def parse_data(self, data):
         """
@@ -45,7 +52,6 @@ class SerialCommunication:
             data_values = [int(h, 16) for h in filtered_data.split()]
             
             parsed_data = {DATA_VARIABLES_NAME[i]: data_values[i] if i < len(data_values) else 0 for i in range(len(DATA_VARIABLES_NAME))}
-            print("Parsed Data:", parsed_data)
             
             self.update_modules(data=parsed_data)
             return parsed_data
@@ -56,35 +62,44 @@ class SerialCommunication:
         """
         Receives data from the serial port
 
-        :return: Data received (as bytes or bytearray)
+        :return: Data received (as bytes) or None if no data is available
         """
         if not self.serial_connection:
             raise Exception("Not connected to any serial port")
         
         try:
-            time.sleep(0.1)  # Allow time for data to arrive
-            raw_data = self.serial_connection.read_all()
-            if raw_data:
-                print(f"Raw data received : {raw_data}")
+            time.sleep(0.05)  # Allow time for data to arrive
+            bytes_available = self.serial_connection.in_waiting
+            if bytes_available > 0:
+                raw_data = self.serial_connection.read(bytes_available)
+                print(f"Received: {raw_data}")
                 return self.parse_data(raw_data)
-            return self.parse_data(raw_data)
+            return None
         except serial.SerialException as e:
             raise Exception(f"Failed to receive data: {e}")
         
-    def send_command(self, command):
+    def send_command(self, command, values=None):
         """
         Sends a command to the device and waits for a response
 
         :param command: Command to be sent to the device
+        :param values: Values to be sent along with the command (optional)
         :return: Response from the device
         """
-        if not self.serial_connection:
+        if not self.serial_connection or not self.serial_connection.is_open:
             raise Exception("Not connected to any serial port")
         
         try:
-            self.serial_connection.write(bytes([command]))
+            if command == CMD_LIGHT:
+                if values and len(values) >= 2:
+                    button_command, brightness_level = values[0], values[1]
+                    self.serial_connection.write(bytes([command]))
+                    self.serial_connection.write(str(button_command).zfill(2).encode('ascii'))
+                    self.serial_connection.write(str(brightness_level).zfill(2).encode('ascii'))
+            elif command == REQUEST_DATA:
+                self.serial_connection.write(bytes([command]))
+
             self.serial_connection.write(bytes([END_FRAME]))
-            print(f"Data sent: {command}")
         except serial.SerialException as e:
             raise Exception(f"Failed to send command: {e}")
 

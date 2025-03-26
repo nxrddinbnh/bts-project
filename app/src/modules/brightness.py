@@ -10,7 +10,7 @@ class Brightness(QFrame):
         :param values: Dictionary containing sensor values
         """
         super().__init__()
-        self.values = values
+        self.values = values if values is not None else {}
         self.labels = {}
         self.setStyleSheet(f"background-color: {BG_200}; border-radius: {RADIUS_200}px; padding: {PADD_200}px;")
         self.setup_ui()
