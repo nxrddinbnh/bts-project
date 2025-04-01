@@ -1,6 +1,5 @@
 import serial
 import time
-from services.serial_config import SerialConfig
 from constants import DATA_VARIABLES_NAME, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 from modules.brightness import Brightness
 
@@ -9,12 +8,9 @@ class SerialCommunication:
     A class to handle serial communication with the solar panel control system
     This class provides methods to send and receive data over the serial connection
     """
-    def __init__(self):
+    def __init__(self, serial_config):
         """Initializes the serial communication using the settings from SerialConfig"""
-        config = SerialConfig().get_config()
-        self.port = config["port"]
-        self.baudrate = config["baudrate"]
-        self.timeout = config["timeout"]
+        self.serial_config = serial_config
         self.serial_connection = None
 
         # Modules
@@ -22,6 +18,11 @@ class SerialCommunication:
 
     def connect(self):
         """Establishes a connection to the serial port"""
+        self.config = self.serial_config.get_config()
+        self.port = self.config["port"]
+        self.baudrate = self.config["baudrate"]
+        self.timeout = self.config["timeout"]
+        
         if not self.port:
             print("No available serial port found")
             return
@@ -31,13 +32,23 @@ class SerialCommunication:
                 self.serial_connection = serial.Serial(
                     port = self.port,
                     baudrate = self.baudrate,
-                    timeout = 10
+                    timeout = self.timeout
                 )
-                print(f"Connected to {self.port} at {self.baudrate} baud")
+
             except serial.SerialException as e:
                 raise Exception(f"Failed to connect to {self.port}: {e}")
         else:
             print(f"Already connected to {self.port}")
+
+    def disconnect(self):
+        """Closes the serial connection if it's open"""
+        if self.serial_connection and self.serial_connection.is_open:
+            try:
+                self.serial_connection.close()
+            except serial.SerialException as e:
+                raise Exception(f"Failed to disconnect from {self.port}: {e}")
+        else:
+            print(f"No active connection to {self.port} to disconnect")
         
     def parse_data(self, data):
         """

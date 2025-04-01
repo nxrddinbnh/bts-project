@@ -9,7 +9,7 @@ BG_200 = "#1B2435"
 BG_300 = "#131529"
 BG_OPACITY = "rgba(40, 49, 66, 0.3)"
 TEXT_100 = "#FFFFFF"
-TEXT_200 = "#C0C0C0"
+TEXT_200 = "#9e9e9e"
 
 # FONTS
 FONT_TITLE = QFont("Lato", 10, 400)

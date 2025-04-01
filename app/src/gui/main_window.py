@@ -1,16 +1,20 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout, QFrame
 from PyQt6.QtGui import QIcon, QFontDatabase
-from constants import BG_300, BG_200, REQUEST_DATA
+from PyQt6.QtCore import Qt
+from constants import BG_300, BG_200
 from gui.sidebar import Sidebar
 from modules.brightness import Brightness
 from modules.lighting import Lighting
+from modules.general import General
 from services.serial_com import SerialCommunication
+from services.serial_config import SerialConfig
 
 class MainWindow(QMainWindow):
     def __init__(self):
         """Initialize the main window and its components"""
         super().__init__()
-        self.serial_com = SerialCommunication()
+        self.serial_config = SerialConfig()
+        self.serial_com = SerialCommunication(self.serial_config)
         self.serial_com.connect()
 
         self.brightness_values = self.serial_com.receive_data()
@@ -18,10 +22,11 @@ class MainWindow(QMainWindow):
         self.load_fonts()  
         self.setup_ui()
         self.create_bentogrid()
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
     def setup_ui(self):
         """Configure the UI layout of the main window"""
-        self.setWindowTitle("")
+        self.setWindowTitle("nx")
                                                                                           
         width, height = 1280, 720
         screen_geometry = self.screen().geometry()
@@ -41,9 +46,11 @@ class MainWindow(QMainWindow):
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
 
+        # Import modules
         sidebar = Sidebar()
         self.brightness = Brightness(self.brightness_values)
         lighting = Lighting(self.serial_com)
+        general = General(self.serial_com, self.serial_config)
 
         def create_block():
             block = QFrame()
@@ -54,14 +61,6 @@ class MainWindow(QMainWindow):
         block3 = create_block()
         block4 = create_block()
         block5 = create_block()
-        block6 = create_block()
-
-        # # Create "Request Data" button
-        # self.request_data_button = QPushButton("Request Data")
-        # self.request_data_button.setStyleSheet(
-        #     "background-color: #007ACC; color: white; border-radius: 10px; padding: 10px; font-size: 16px;"
-        # )
-        # self.request_data_button.clicked.connect(self.request_data)
 
         # Add widgets to the grid layout
         layout.addWidget(sidebar, 0, 0, 2, 1)
@@ -70,8 +69,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(block3, 1, 1, 1, 1)
         layout.addWidget(block4, 1, 2, 1, 1)
         layout.addWidget(block5, 1, 3, 1, 2)
-        layout.addWidget(block6, 1, 5, 1, 1)
-        # layout.addWidget(self.request_data_button, 2, 0, 1, 6)  # Add button to layout
+        layout.addWidget(general, 1, 5, 1, 1)
 
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(1, 3)
@@ -103,8 +101,3 @@ class MainWindow(QMainWindow):
 
         except Exception as e:
             print(f"An error occurred while loading fonts: {e}")
-
-    # def request_data(self):
-    #     """Send REQUEST_DATA command and handle the response"""
-    #     response = self.serial_com.send_command(REQUEST_DATA)
-    #     print(f"Received response: {response}")

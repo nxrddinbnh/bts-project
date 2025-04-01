@@ -14,11 +14,11 @@ class SerialConfig:
         self._timeout = timeout
         self._port = self.find_highest_port()
 
-    def find_highest_port(self):
+    def get_available_ports(self):
         """
-        Find the highest available serial port
+        Obtain all available COM ports 
 
-        :return: The highest numbered serial port
+        :return: All available ports
         """
         available_ports = []
 
@@ -31,6 +31,16 @@ class SerialConfig:
                 available_ports.append(port)
             except (OSError, serial.SerialException):
                 pass
+
+        return available_ports
+
+    def find_highest_port(self):
+        """
+        Find the highest available serial port
+
+        :return: The highest numbered serial port
+        """
+        available_ports = self.get_available_ports()
 
         # Find the highest COM port
         if available_ports:
