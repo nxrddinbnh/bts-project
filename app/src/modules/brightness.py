@@ -3,15 +3,14 @@ from PyQt6.QtCore import Qt
 from constants import BG_200, BG_OPACITY, FONT_TITLE, FONT_BODY, FONT_VALUES, TEXT_200, RADIUS_100, RADIUS_200, PADD_100, PADD_200
 
 class Brightness(QFrame):
-    def __init__(self, values):
+    def __init__(self):
         """
         Initializes the Brightness widget.
         
         :param values: Dictionary containing sensor values
         """
         super().__init__()
-        self.values = values if values is not None else {}
-        self.labels = {}
+        self.value_labels = {}
         self.setStyleSheet(f"background-color: {BG_200}; border-radius: {RADIUS_200}px; padding: {PADD_200}px;")
         self.setup_ui()
 
@@ -29,15 +28,13 @@ class Brightness(QFrame):
         # Sensor frames (North, South, East, West)
         sensor_layout = QHBoxLayout()
         for direction in ["north", "south", "east", "west"]:
-            sensor_frame = self.create_sensor_frame(self.values.get(f"lum_{direction}", 0), direction.upper())
+            sensor_frame = self.create_sensor_frame(0, direction.upper())
             sensor_layout.addWidget(sensor_frame)
             sensor_layout.addSpacing(4)
-            self.labels[direction] = sensor_frame
 
         # Average sensor
-        avg_frame = self.create_sensor_frame(self.values.get("lum_avg", 0), "average".upper())
+        avg_frame = self.create_sensor_frame(0, "average".upper())
         sensor_layout.addWidget(avg_frame, stretch=2)
-        self.labels["average"] = avg_frame
         
         main_layout.addLayout(sensor_layout)
         self.setLayout(main_layout)
@@ -59,6 +56,7 @@ class Brightness(QFrame):
 
         # Create and add value label
         value_label = self.create_label(str(value), FONT_VALUES)
+        self.value_labels[label] = value_label
         layout.addWidget(value_label)
 
         # Sensor direction label
@@ -83,13 +81,12 @@ class Brightness(QFrame):
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         return label
     
-    def update_values(self, new_values):
+    def update_values(self, data):
         """
         Updates sensor values
 
-        :param new_values: New sensor values
+        :param data: Parsed data
         """
-        for key, label in self.labels.items():
-            if key in new_values:
-                if isinstance(label, QLabel):
-                    label.setText(str(new_values[key]))
+        for key, label in self.value_labels.items():
+            value = data.get(f"lum_{key.lower()}")
+            label.setText(str(value))

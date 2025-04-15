@@ -1,20 +1,15 @@
 import serial
 import time
-from constants import DATA_VARIABLES_NAME, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
+from constants import VARIABLES_NAME, FIELD_LENGTHS, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 from modules.brightness import Brightness
 
 class SerialCommunication:
-    """
-    A class to handle serial communication with the solar panel control system
-    This class provides methods to send and receive data over the serial connection
-    """
-    def __init__(self, serial_config):
+    """Handles serial communication with the solar panel control system"""
+    def __init__(self, serial_config, brightness_mod=None):
         """Initializes the serial communication using the settings from SerialConfig"""
         self.serial_config = serial_config
         self.serial_connection = None
-
-        # Modules
-        self.brightness_mod = Brightness({})
+        self.brightness_mod = brightness_mod
 
     def connect(self):
         """Establishes a connection to the serial port"""
@@ -34,7 +29,6 @@ class SerialCommunication:
                     baudrate = self.baudrate,
                     timeout = self.timeout
                 )
-
             except serial.SerialException as e:
                 raise Exception(f"Failed to connect to {self.port}: {e}")
         else:
@@ -58,16 +52,39 @@ class SerialCommunication:
         :return A dictionary containing values
         """
         try:
-            data_str = data.decode('utf-8').strip()
-            filtered_data = data_str[1:-1] # Remove the first (0xFA) and last (0x0D) bytes
-            data_values = [int(h, 16) for h in filtered_data.split()]
-            
-            parsed_data = {DATA_VARIABLES_NAME[i]: data_values[i] if i < len(data_values) else 0 for i in range(len(DATA_VARIABLES_NAME))}
-            
-            self.update_modules(data=parsed_data)
-            return parsed_data
+            frame = data.decode('ascii').strip()
+            print(frame)
+
+            if frame.startswith('FA') and frame.endswith('0D'):
+                filtered_frame = frame[2:-2] # Remove 0xFA and 0x0D
+                data_values = []
+                index = 0
+
+                # Extract data according to field length
+                for length in FIELD_LENGTHS:
+                    field_value = filtered_frame[index:index + length].strip()
+
+                    # Convert to int to avoid errors
+                    if field_value == "0A" and VARIABLES_NAME[index] == "correction_on":
+                        field_value = "01"
+
+                    try:
+                       data_values.append(int(field_value) if field_value else 0)
+                    except ValueError:
+                        print(f"Error converting field value: '{field_value}' to int, at index: {index}")
+                        data_values.append(0)
+                    
+                    index += length
+
+                parsed_data = {VARIABLES_NAME[i]: data_values[i] for i in range(len(VARIABLES_NAME))}
+                self.update_modules(data=parsed_data)
+                return parsed_data
+            else:
+                print("Incomplete or invalid frame")
+                return None
         except Exception as e:
             print(f"Error parsing data: {e}")
+            return None
 
     def receive_data(self):
         """
@@ -79,12 +96,17 @@ class SerialCommunication:
             raise Exception("Not connected to any serial port")
         
         try:
-            time.sleep(0.05)  # Allow time for data to arrive
-            bytes_available = self.serial_connection.in_waiting
-            if bytes_available > 0:
-                raw_data = self.serial_connection.read(bytes_available)
-                print(f"Received: {raw_data}")
-                return self.parse_data(raw_data)
+            time.sleep(0.1)  # Allow time for data to arrive
+            buffer = b""
+
+            # Keep reading while data is available in the buffer
+            while self.serial_connection.in_waiting > 0:
+                raw_data = self.serial_connection.read(self.serial_connection.in_waiting)
+                buffer += raw_data
+
+            # Attempt to parse the entire frame once we have data
+            if len(buffer) > 0:
+                return self.parse_data(buffer)
             return None
         except serial.SerialException as e:
             raise Exception(f"Failed to receive data: {e}")
@@ -122,12 +144,7 @@ class SerialCommunication:
         
         :param data: Parsed data
         """
-        brightness_values = {
-            "lum_north": data.get("lum_north"),
-            "lum_south": data.get("lum_south"),
-            "lum_east": data.get("lum_east"),
-            "lum_west": data.get("lum_west"),
-            "lum_avg": data.get("lum_avg")
-        }
-
-        self.brightness_mod.update_values(brightness_values)
+        try:
+            self.brightness_mod.update_values(data)
+        except Exception as e:
+            raise Exception(f"Failed to update modules: {e}")

@@ -14,10 +14,14 @@ class MainWindow(QMainWindow):
         """Initialize the main window and its components"""
         super().__init__()
         self.serial_config = SerialConfig()
-        self.serial_com = SerialCommunication(self.serial_config)
+        self.brightness = Brightness()
+        self.serial_com = SerialCommunication(self.serial_config, self.brightness)
         self.serial_com.connect()
 
-        self.brightness_values = self.serial_com.receive_data()
+        # Import modules
+        self.sidebar = Sidebar()
+        self.lighting = Lighting(self.serial_com)
+        self.general = General(self.serial_com, self.serial_config)
 
         self.load_fonts()  
         self.setup_ui()
@@ -46,12 +50,6 @@ class MainWindow(QMainWindow):
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
 
-        # Import modules
-        sidebar = Sidebar()
-        self.brightness = Brightness(self.brightness_values)
-        lighting = Lighting(self.serial_com)
-        general = General(self.serial_com, self.serial_config)
-
         def create_block():
             block = QFrame()
             block.setStyleSheet(f"background-color: {BG_200}; border-radius: 20px;")
@@ -63,13 +61,13 @@ class MainWindow(QMainWindow):
         block5 = create_block()
 
         # Add widgets to the grid layout
-        layout.addWidget(sidebar, 0, 0, 2, 1)
+        layout.addWidget(self.sidebar, 0, 0, 2, 1)
         layout.addWidget(self.brightness, 0, 1, 1, 3)
-        layout.addWidget(lighting, 0, 4, 1, 2)
+        layout.addWidget(self.lighting, 0, 4, 1, 2)
         layout.addWidget(block3, 1, 1, 1, 1)
         layout.addWidget(block4, 1, 2, 1, 1)
         layout.addWidget(block5, 1, 3, 1, 2)
-        layout.addWidget(general, 1, 5, 1, 1)
+        layout.addWidget(self.general, 1, 5, 1, 1)
 
         layout.setColumnStretch(0, 1)
         layout.setColumnStretch(1, 3)

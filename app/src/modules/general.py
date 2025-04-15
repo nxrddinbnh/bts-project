@@ -65,8 +65,8 @@ class General(QFrame):
         # Input for Period of Measurement
         period_label = self.create_label("Period (ms)")
         period_input = QSpinBox()
-        period_input.setRange(1, 10000)
-        period_input.setValue(100)
+        period_input.setRange(1000, 10000)
+        period_input.setValue(2000)
         period_input.setStyleSheet(self.input_style())
         period_input.valueChanged.connect(self.update_period)
 
