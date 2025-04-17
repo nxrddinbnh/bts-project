@@ -1,28 +1,25 @@
-from PyQt6.QtWidgets import QFrame, QVBoxLayout, QLabel, QVBoxLayout, QSizePolicy, QSlider, QGridLayout, QPushButton
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QGridLayout, QSlider
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
-from constants import BG_100, BG_200, RADIUS_100, RADIUS_200, PADD_200, FONT_TITLE, FONT_BODY, FONT_VALUES, PRIMARY, CMD_LIGHT
+from base import set_module_style, title_label, create_label, create_button
+from constants import BG_100, PRIMARY, TEXT_100, FONT_BODY, FONT_VALUES, RADIUS_100, CMD_LIGHT
 
 class Lighting(QFrame):
     def __init__(self, serial_com):
         """
         Initializes the Lighting widget
-
         :serial_com: SerialCommunication instance for handling communication
         """
         super().__init__()
-        self.setStyleSheet(f"background-color: {BG_200}; border-radius: {RADIUS_200}px; padding: {PADD_200}px;")
         self.serial_com = serial_com
+        self.buttons = {}
+        set_module_style(self)
         self.setup_ui()
 
     def setup_ui(self):
         """Setup UI layout for the lighting module"""
         main_layout = QVBoxLayout(self)
+        main_layout.addWidget(title_label("general")) # Title label
         layout  = QGridLayout()
-
-        # Title label
-        title_label = self.create_label("lighting", FONT_TITLE, "padding-left: 0; color: white;", alignment=Qt.AlignmentFlag.AlignLeft)
-        main_layout.addWidget(title_label)
 
         # Slider Frame
         self.slider = QSlider(Qt.Orientation.Vertical)
@@ -34,36 +31,30 @@ class Lighting(QFrame):
         layout.addWidget(self.slider, 0, 0, 3, 1)
 
         # Slider icon label
-        icon_slider = self.create_label("", FONT_BODY, "color: white; padding: 0; background: none;", "assets/icons/sun.svg")
+        icon_slider = create_label("", FONT_BODY, f"color: {TEXT_100}; padding: 0; background: none;", icon_path="assets/icons/sun.svg")
         layout.addWidget(icon_slider, 2, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
 
         # Buttons
-        self.create_buttons(layout)
+        self.button_states = {name: False for name in ["1", "2", "3", "4", "All"]}
+        button_positions = [
+            (0, 1, 1, 2, "1"), (0, 3, 2, 1, "2"),
+            (1, 1, 2, 1, "4"), (2, 2, 1, 2, "3"),
+            (1, 2, 1, 1, "All")
+        ]
+
+        for row, col, row_span, col_span, name in button_positions:
+            button = create_button(name, FONT_VALUES, self.set_button_style(False), lambda _, n=name: self.toggle_button(n))
+            self.buttons[name] = button
+            layout.addWidget(button, row, col, row_span, col_span)
 
         main_layout.addLayout(layout)
         self.setLayout(main_layout)
 
-    def create_label(self, text, font, style, icon_path=None, alignment=Qt.AlignmentFlag.AlignCenter):
-        """
-        Creates a QLabel with specified text, font, and style
-
-        :param text: Text to be displayed in the label
-        :param font: Font style to be applied to the label
-        :param style: CSS style string to format the label
-        :param icon_path: Icon file path (optional)
-        :param alignment: Text alignement (optional)
-        :return: A QLabel object with the specified properties
-        """
-        label = QLabel(text.upper())
-        label.setFont(font)
-        label.setStyleSheet(style)
-        label.setAlignment(alignment)
-        if icon_path:
-            label.setPixmap(QPixmap(icon_path).scaled(25, 25, Qt.AspectRatioMode.KeepAspectRatio))
-        return label
-    
     def set_slider_style(self, is_disabled):
-        """Returns the stylesheet for the slider based on its state"""
+        """
+        Returns the stylesheet for the slider based on its state
+        :param is_disabled: Disable the slider if the "all" button is not active
+        """
         color = "gray" if is_disabled else PRIMARY
         self.slider.setEnabled(not is_disabled)
         return f"""
@@ -85,38 +76,17 @@ class Lighting(QFrame):
             }}
         """
     
-    def create_buttons(self, layout):
-        """Create buttons to control the panel LEDs"""
-        self.buttons = {}
-        button_positions = [
-            (0, 1, 1, 2, "1"), (0, 3, 2, 1, "2"),
-            (1, 1, 2, 1, "4"), (2, 2, 1, 2, "3"),
-            (1, 2, 1, 1, "All")
-        ]
-        self.button_states = {
-            "1": False, "2": False, "3": False,
-            "4": False, "All": False
-        }
-
-        for row, col, row_span, col_span, btn_name in button_positions:
-            button = QPushButton(btn_name)
-            button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
-            button.setCursor(Qt.CursorShape.PointingHandCursor)
-            button.setFont(FONT_VALUES)
-            button.setStyleSheet(self.set_button_style(False))
-            button.clicked.connect(lambda _, num=btn_name: self.toggle_button(num))
-            self.buttons[btn_name] = button
-            layout.addWidget(button, row, col, row_span, col_span)
-
     def set_button_style(self, is_active):
-        """Returns the stylesheet for the button based on its state"""
+        """
+        :param is_active: Boolean to indicate the status of the button
+        :return: Stylesheet for the button based on its state
+        """
         color = PRIMARY if is_active else BG_100
-        return f"background-color: {color}; color: white; border-radius: {RADIUS_100}px;"
+        return f"background-color: {color}; color: {TEXT_100}; border-radius: {RADIUS_100}px;"
 
     def toggle_button(self, button_name):
         """
         Toggles button state and slider status
-
         :param button_name: The ID of the button clicked
         """
         # Check if the button is already active
@@ -161,7 +131,6 @@ class Lighting(QFrame):
     def get_button_command(self):
         """
         Returns the corresponding command based on the activated button
-
         :return: The command value (0-5)
         """
         if self.button_states["All"]: 
@@ -172,4 +141,3 @@ class Lighting(QFrame):
                 button_number = int(button)
                 return button_number + 1
         return 0
-    

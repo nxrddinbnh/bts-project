@@ -1,90 +1,61 @@
-from PyQt6.QtWidgets import QFrame, QLabel, QVBoxLayout, QHBoxLayout
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QSizePolicy, QSpacerItem
 from PyQt6.QtCore import Qt
-from constants import BG_200, BG_OPACITY, FONT_TITLE, FONT_BODY, FONT_VALUES, TEXT_200, RADIUS_100, RADIUS_200, PADD_100, PADD_200
+from base import set_module_style, title_label, create_label
+from constants import BG_OPACITY, RADIUS_100, FONT_VALUES, PADD_100, TEXT_100, TEXT_200, FONT_BODY
 
 class Brightness(QFrame):
     def __init__(self):
-        """
-        Initializes the Brightness widget.
-        
-        :param values: Dictionary containing sensor values
-        """
+        """Initializes the Brightness widget"""
         super().__init__()
         self.value_labels = {}
-        self.setStyleSheet(f"background-color: {BG_200}; border-radius: {RADIUS_200}px; padding: {PADD_200}px;")
+        set_module_style(self)
         self.setup_ui()
 
     def setup_ui(self):
         """Sets up the UI layout for the brightness module"""
-        main_layout = QVBoxLayout(self)
+        layout = QVBoxLayout(self)
+        layout.addWidget(title_label("brightness")) # Title label
 
-        # Title label
-        title_label = QLabel("brightness".upper())
-        title_label.setFont(FONT_TITLE)
-        title_label.setStyleSheet("padding-left: 0; color: white;")
-        title_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        main_layout.addWidget(title_label)
-
-        # Sensor frames (North, South, East, West)
+        # Frames
         sensor_layout = QHBoxLayout()
-        for direction in ["north", "south", "east", "west"]:
-            sensor_frame = self.create_sensor_frame(0, direction.upper())
-            sensor_layout.addWidget(sensor_frame)
-            sensor_layout.addSpacing(4)
+        for text in ["north", "south", "east", "west", "average"]:
+            frame = self.create_frame(0, text.upper())
+            sensor_layout.addWidget(frame)
 
-        # Average sensor
-        avg_frame = self.create_sensor_frame(0, "average".upper())
-        sensor_layout.addWidget(avg_frame, stretch=2)
-        
-        main_layout.addLayout(sensor_layout)
-        self.setLayout(main_layout)
+        layout.addLayout(sensor_layout)
+        self.setLayout(layout)
 
-    def create_sensor_frame(self, value, label):
+    def create_frame(self, value, text):
         """
-        Creates a sensor frame with a number above and the label below.
-        
-        :param value: Sensor value to be displayed.
-        :param label: Label for the sensor (e.g., "NORTH", "SOUTH").
+        Creates a frame with a number above and the label below
+        :param value: Value to be displayed
+        :param label: Label for the value (e.g., "NORTH", "SOUTH")
         :return: QFrame containing the sensor data.
         """
         frame = QFrame()
         frame.setStyleSheet(f"background-color: {BG_OPACITY}; border-radius: {RADIUS_100}px;")
-        
         layout = QVBoxLayout(frame)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addStretch()
+
+        # Spacer to push widgets to the bottom
+        spacer = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        layout.addItem(spacer)
 
         # Create and add value label
-        value_label = self.create_label(str(value), FONT_VALUES)
-        self.value_labels[label] = value_label
+        value_label = create_label(str(value), FONT_VALUES, f"background-color: transparent; color: {TEXT_100}; padding: {PADD_100}px")
+        self.value_labels[text] = value_label
         layout.addWidget(value_label)
 
-        # Sensor direction label
-        text_label = self.create_label(label, FONT_BODY, color=TEXT_200)
+        # Title label
+        text_label = create_label(text, FONT_BODY, f"background-color: transparent; color: {TEXT_200}; padding: 0px")
         layout.addWidget(text_label)
 
+        frame.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         frame.setLayout(layout)
         return frame
 
-    def create_label(self, text, font, color="white"):
-        """
-        Creates a QLabel with the specified text and font.
-        
-        :param text: The text to be displayed in the label.
-        :param font: The font to be applied to the label.
-        :param color: (Optional) Text color in CSS format (e.g., "white", "#FF0000").
-        :return: A QLabel with the specified properties.
-        """
-        label = QLabel(text)
-        label.setFont(font)
-        label.setStyleSheet(f"background-color: transparent; color: {color}; padding: 0px" if color else f"background-color: transparent; padding: {PADD_100}px")
-        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        return label
-    
     def update_values(self, data):
         """
         Updates sensor values
-
         :param data: Parsed data
         """
         for key, label in self.value_labels.items():

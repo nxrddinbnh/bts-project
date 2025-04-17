@@ -1,12 +1,9 @@
 import serial.tools.list_ports
 
 class SerialConfig:
-    """A class to manage serial connection settings dynamically"""
     def __init__(self, baudrate=9600, timeout=1):
         """
         Initialize the serial configuration with default values
-
-        :param port: Serial port name
         :param baudrate: Baud rate for the serial connection
         :param timeout: Timeout in seconds for serial communication
         """
@@ -17,7 +14,6 @@ class SerialConfig:
     def get_available_ports(self):
         """
         Obtain all available COM ports 
-
         :return: All available ports
         """
         available_ports = []
@@ -31,13 +27,11 @@ class SerialConfig:
                 available_ports.append(port)
             except (OSError, serial.SerialException):
                 pass
-
         return available_ports
 
     def find_highest_port(self):
         """
         Find the highest available serial port
-
         :return: The highest numbered serial port
         """
         available_ports = self.get_available_ports()
@@ -52,7 +46,6 @@ class SerialConfig:
     def set_baudrate(self, baudrate):
         """
         Update the baud rate for the serial connection
-
         :param baudrate: New baud rate
         """
         self._baudrate = baudrate
@@ -60,7 +53,6 @@ class SerialConfig:
     def set_timeout(self, timeout):
         """
         Update the timeout value for serial communication
-
         :param timeout: Timeout in seconds
         """
         self._timeout = timeout
@@ -68,7 +60,6 @@ class SerialConfig:
     def set_port(self, port):
         """
         Update the serial port name
-
         :param port: New serial port name
         """
         self._port = port
@@ -76,7 +67,6 @@ class SerialConfig:
     def get_config(self):
         """
         Retrieve the current serial configuration settings
-
         :return: A dictionary containing 'port', 'baudrate', and 'timeout' values
         """
         return {
