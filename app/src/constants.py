@@ -14,6 +14,7 @@ TEXT_200 = "#9e9e9e"
 # FONTS
 FONT_TITLE = QFont("Lato", 10, 400)
 FONT_BODY = QFont("Lato", 8, QFont.Weight.Normal)
+FONT_BODY_B = QFont("Lato", 12, QFont.Weight.Bold)
 FONT_VALUES = QFont("Lato", 25, QFont.Weight.Bold)
 
 # RADIUS & PADDING
@@ -48,7 +49,7 @@ VARIABLES_NAME = [
     "curr_batt",        # battery current
     "charge",           # charge indicator
     "full_charge",      # full charge indicator
-    "discharge",        # discharge indicator
+    "empty_charge",     # empty charge indicator
 
     "light_on",         # lighting indicator
     "light_lvl",        # lighting level

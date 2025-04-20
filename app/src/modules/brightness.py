@@ -1,5 +1,4 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QSizePolicy, QSpacerItem
-from PyQt6.QtCore import Qt
 from base import set_module_style, title_label, create_label
 from constants import BG_OPACITY, RADIUS_100, FONT_VALUES, PADD_100, TEXT_100, TEXT_200, FONT_BODY
 
