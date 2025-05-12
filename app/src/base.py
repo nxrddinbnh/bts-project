@@ -1,9 +1,9 @@
-from PyQt6.QtWidgets import QLabel, QPushButton, QSizePolicy, QSpinBox, QComboBox, QFrame, QVBoxLayout
+from PyQt6.QtWidgets import QLabel, QPushButton, QSizePolicy, QSpinBox, QComboBox
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QFontDatabase
 from constants import (
-    BG_100, BG_200, BG_OPACITY, TEXT_100, TEXT_200, PRIMARY, SECONDARY, ACCENT, 
-    RADIUS_100, RADIUS_200, PADD_100, PADD_200, FONT_TITLE, FONT_BODY, FONT_VALUES
+    BG_100, BG_200, TEXT_100, PRIMARY, SECONDARY, 
+    RADIUS_100, RADIUS_200, PADD_100, PADD_200, FONT_TITLE, FONT_BODY
 )
 
 def load_fonts():
@@ -78,7 +78,7 @@ def create_input(min_range, max_range, value):
     """
     style = f"""
         QSpinBox {{
-            height: 30px;
+            height: 32px;
             background-color: {BG_100};
             border-radius: {RADIUS_100}px;
             padding: {PADD_100}px;
@@ -110,7 +110,7 @@ def create_combo(items, current):
     """
     style = f"""
         QComboBox {{
-            height: 30px;
+            height: 32px;
             background-color: {BG_100};
             border-radius: {RADIUS_100}px;
             padding: {PADD_100}px;

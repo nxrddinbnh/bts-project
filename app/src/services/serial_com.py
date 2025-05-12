@@ -64,16 +64,7 @@ class SerialCommunication:
                 # Extract data according to field length
                 for length in FIELD_LENGTHS:
                     field_value = filtered_frame[index:index + length].strip()
-
-                    # Convert to int to avoid errors
-                    if field_value == "0A" and VARIABLES_NAME[index] == "correction_on":
-                        field_value = "01"
-
-                    try:
-                        data_values.append(int(field_value) if field_value else 0)
-                    except ValueError:
-                        print(f"Error converting field value: '{field_value}' to int, at index: {index}")
-                        data_values.append(0)
+                    data_values.append(field_value)
                     index += length
 
                 parsed_data = {VARIABLES_NAME[i]: data_values[i] for i in range(len(VARIABLES_NAME))}
@@ -103,9 +94,24 @@ class SerialCommunication:
                 raw_data = self.serial_connection.read(self.serial_connection.in_waiting)
                 buffer += raw_data
 
-            # Attempt to parse the entire frame once we have data
-            if len(buffer) > 0:
-                return self.parse_data(buffer)
+            # Decode once
+            try:
+                decoded = buffer.decode("ascii")
+            except UnicodeDecodeError:
+                print("Failed to decode serial data")
+                return None
+            
+            # Process all complete frames
+            while True:
+                start = decoded.find("FA")
+                end = decoded.find("0D", start)
+                if start == -1 or end == -1:
+                    break
+
+                # Process one complete frame at a time
+                frame = decoded[start:end + 2]
+                parsed = self.parse_data(frame.encode("ascii"))
+                return parsed 
             return None
         except serial.SerialException as e:
             raise Exception(f"Failed to receive data: {e}")
@@ -127,6 +133,12 @@ class SerialCommunication:
                     self.serial_connection.write(bytes([command]))
                     self.serial_connection.write(str(button_command).zfill(2).encode('ascii'))
                     self.serial_connection.write(str(brightness_level).zfill(2).encode('ascii'))
+            elif command == CMD_CORRECT:
+                mode, threshold, period = values[0], values[1], values[2]
+                self.serial_connection.write(bytes([command]))
+                self.serial_connection.write(str(mode).zfill(2).encode('ascii'))
+                self.serial_connection.write(str(threshold).zfill(2).encode('ascii'))
+                self.serial_connection.write(str(period).zfill(2).encode('ascii'))
             elif command == REQUEST_DATA:
                 self.serial_connection.write(bytes([command]))
 

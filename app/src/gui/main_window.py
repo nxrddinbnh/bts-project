@@ -8,6 +8,7 @@ from gui.sidebar import Sidebar
 from modules.lighting import Lighting
 from modules.general import General
 from modules.energy import Energy
+from modules.correction import Correction
 from base import load_fonts
 from constants import BG_300
 
@@ -24,7 +25,7 @@ class MainWindow(QMainWindow):
         self.sidebar = Sidebar()
         self.lighting = Lighting(self.serial_com)
         self.general = General(self.serial_com, self.serial_config)
-        # self.correction = ""
+        self.correction = Correction(self.serial_com)
         # self.motor = ""
 
         load_fonts()  
@@ -56,7 +57,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.brightness, 0, 1, 1, 3)
         layout.addWidget(self.lighting, 0, 4, 1, 2)
         layout.addWidget(self.energy, 1, 1, 1, 1)
-        # layout.addWidget(self.correction, 1, 2, 1, 1)
+        layout.addWidget(self.correction, 1, 2, 1, 1)
         # layout.addWidget(self.motor, 1, 3, 1, 2)
         layout.addWidget(self.general, 1, 5, 1, 1)
 
