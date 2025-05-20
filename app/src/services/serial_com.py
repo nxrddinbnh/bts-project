@@ -3,7 +3,7 @@ import time
 from constants import VARIABLES_NAME, FIELD_LENGTHS, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 
 class SerialCommunication:
-    def __init__(self, serial_config, brightness_mod=None, energy_mod=None):
+    def __init__(self, serial_config, brightness_mod=None, energy_mod=None, motor_mod=None):
         """
         Initializes the serial communication using the settings from SerialConfig
         :param serial_config: To get the serial configuration
@@ -13,6 +13,7 @@ class SerialCommunication:
         self.serial_connection = None
         self.brightness_mod = brightness_mod
         self.energy_mod = energy_mod
+        self.motor_mod = motor_mod
 
     def connect(self):
         """Establishes a connection to the serial port"""
@@ -139,6 +140,18 @@ class SerialCommunication:
                 self.serial_connection.write(str(mode).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(threshold).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(period).zfill(2).encode('ascii'))
+            elif command == CMD_MOTOR_ELEV:
+                direction, duration, park = values[0], values[1], values[2]
+                self.serial_connection.write(bytes([command]))
+                self.serial_connection.write(str(direction).zfill(2).encode('ascii'))
+                self.serial_connection.write(str(duration).zfill(2).encode('ascii'))
+                self.serial_connection.write(str(park).zfill(1).encode('ascii'))
+            elif command == CMD_MOTOR_AZIM:
+                direction, duration, park = values[0], values[1], values[2]
+                self.serial_connection.write(bytes([command]))
+                self.serial_connection.write(str(direction).zfill(2).encode('ascii'))
+                self.serial_connection.write(str(duration).zfill(2).encode('ascii'))
+                self.serial_connection.write(str(park).zfill(1).encode('ascii'))
             elif command == REQUEST_DATA:
                 self.serial_connection.write(bytes([command]))
 
@@ -156,5 +169,6 @@ class SerialCommunication:
         try:
             self.brightness_mod.update_values(data)
             self.energy_mod.update_values(data)
+            self.motor_mod.update_values(data)
         except Exception as e:
             raise Exception(f"Failed to update modules: {e}")

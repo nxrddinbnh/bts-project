@@ -9,6 +9,7 @@ from modules.lighting import Lighting
 from modules.general import General
 from modules.energy import Energy
 from modules.correction import Correction
+from modules.motor import Motor
 from base import load_fonts
 from constants import BG_300
 
@@ -26,7 +27,8 @@ class MainWindow(QMainWindow):
         self.lighting = Lighting(self.serial_com)
         self.general = General(self.serial_com, self.serial_config)
         self.correction = Correction(self.serial_com)
-        # self.motor = ""
+        self.motor = Motor(self.serial_com, self)
+        self.serial_com.motor_mod = self.motor
 
         load_fonts()  
         self.setup_ui()
@@ -58,7 +60,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.lighting, 0, 4, 1, 2)
         layout.addWidget(self.energy, 1, 1, 1, 1)
         layout.addWidget(self.correction, 1, 2, 1, 1)
-        # layout.addWidget(self.motor, 1, 3, 1, 2)
+        layout.addWidget(self.motor, 1, 3, 1, 2)
         layout.addWidget(self.general, 1, 5, 1, 1)
 
         layout.setColumnStretch(0, 1)

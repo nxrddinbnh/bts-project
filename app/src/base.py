@@ -51,7 +51,7 @@ def title_label(text):
     """
     return create_label(text.upper(), FONT_TITLE, f"padding-left: 0; color: {TEXT_100};", Qt.AlignmentFlag.AlignLeft)
 
-def create_button(text, font, style, action):
+def create_button(text, font, style, action=None):
     """
     QPushButton with the given properties and click behavior
     :param text: The button label text
@@ -65,7 +65,8 @@ def create_button(text, font, style, action):
     button.setCursor(Qt.CursorShape.PointingHandCursor)
     button.setFont(font)
     button.setStyleSheet(style)
-    button.clicked.connect(action)
+    if action is not None:
+        button.clicked.connect(action)
     return button
 
 def create_input(min_range, max_range, value):
