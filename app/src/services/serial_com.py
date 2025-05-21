@@ -1,5 +1,6 @@
 import serial
 import time
+from services.api_service import APIService
 from constants import VARIABLES_NAME, FIELD_LENGTHS, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 
 class SerialCommunication:
@@ -14,6 +15,7 @@ class SerialCommunication:
         self.brightness_mod = brightness_mod
         self.energy_mod = energy_mod
         self.motor_mod = motor_mod
+        self.api_service = APIService()
 
     def connect(self):
         """Establishes a connection to the serial port"""
@@ -70,6 +72,7 @@ class SerialCommunication:
 
                 parsed_data = {VARIABLES_NAME[i]: data_values[i] for i in range(len(VARIABLES_NAME))}
                 self.update_modules(data=parsed_data)
+                self.api_service.send_data(parsed_data) # Sends the data to the API
                 return parsed_data
             else:
                 print("Incomplete or invalid frame")
@@ -166,6 +169,9 @@ class SerialCommunication:
         Update all system modules based on the latest parsed data
         :param data: Parsed data
         """
+        all_data = self.api_service.get_by_id(45)
+        print(all_data)  
+
         try:
             self.brightness_mod.update_values(data)
             self.energy_mod.update_values(data)

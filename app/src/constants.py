@@ -80,3 +80,14 @@ FIELD_LENGTHS = [
     2, 2,
     3, 3, 
 ]
+
+# VARIABLES FOR THE API
+ALLOWED_KEYS = {
+    "lum_east", "lum_west", "lum_north", "lum_south", "lum_average",
+    "volt_panel", "volt_batt", "curr_panel", "curr_batt",
+    "charge", "full_charge", "empty_charge",
+    "light_on", "light_lvl",
+    "curr_m1", "curr_m2",
+    "angle_az", "angle_el",
+    "correction_on", "correction_int", "correction_thr"
+}

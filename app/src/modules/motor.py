@@ -16,7 +16,6 @@ class Motor(QFrame):
         self.toast_notif = ToastNotif(main_window)
         self.value_labels = {}
         self.time_value = 1
-        self.is_moving = False
         self.setup_ui()
 
     def setup_ui(self):
@@ -187,11 +186,6 @@ class Motor(QFrame):
         Handles directional button commands
         :param direction: up, down, left or right
         """
-        # Check if it is already in motion and avoid sending new command if so
-        if self.is_moving:
-            self.toast_notif.show_message("motor_move")
-            return
-
         if direction in ["up", "down"]:
             cmd = CMD_MOTOR_ELEV
             current_angle = self.value_labels["el"].angle
@@ -234,6 +228,3 @@ class Motor(QFrame):
                 overload = data.get(intensity_key, 0)
                 self.value_labels[intensity_label_key].setText(str(overload))
                 
-        # Update self.is_moving
-        self.is_moving = bool(data.get("moving", 0))
-            
