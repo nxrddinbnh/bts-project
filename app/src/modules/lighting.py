@@ -18,7 +18,7 @@ class Lighting(QFrame):
     def setup_ui(self):
         """Setup UI layout for the lighting module"""
         main_layout = QVBoxLayout(self)
-        main_layout.addWidget(title_label("general")) # Title label
+        main_layout.addWidget(title_label("lighting")) # Title label
         layout  = QGridLayout()
 
         # Slider Frame
@@ -28,18 +28,18 @@ class Lighting(QFrame):
         self.slider.setStyleSheet(self.set_slider_style(True))
         self.slider.setCursor(Qt.CursorShape.PointingHandCursor)
         self.slider.valueChanged.connect(self.send_command)
-        layout.addWidget(self.slider, 0, 0, 3, 1)
+        layout.addWidget(self.slider, 0, 0, 2, 1)
 
         # Slider icon label
         icon_slider = create_label("", FONT_BODY, f"color: {TEXT_100}; padding: 0; background: none;", icon_path="assets/icons/sun.svg")
-        layout.addWidget(icon_slider, 2, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(icon_slider, 1, 0, 1, 1, Qt.AlignmentFlag.AlignCenter)
 
         # Buttons
         self.button_states = {name: False for name in ["1", "2", "3", "4", "All"]}
         button_positions = [
-            (0, 1, 1, 2, "1"), (0, 3, 2, 1, "2"),
-            (1, 1, 2, 1, "4"), (2, 2, 1, 2, "3"),
-            (1, 2, 1, 1, "All")
+            (0, 1, 1, 1, "1"), (0, 2, 1, 1, "2"),
+            (0, 4, 1, 1, "4"), (0, 3, 1, 1, "3"),
+            (1, 1, 1, 4, "All")
         ]
 
         for row, col, row_span, col_span, name in button_positions:
@@ -141,3 +141,4 @@ class Lighting(QFrame):
                 button_number = int(button)
                 return button_number + 1
         return 0
+    

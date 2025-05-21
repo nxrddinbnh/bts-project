@@ -47,7 +47,7 @@ class General(QFrame):
 
         # Input for Period of Measurement
         period_label = create_label("Period (ms)" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
-        period_input = create_input(1000, 20000, 2000)
+        period_input = create_input(1000, 60000, 2000)
         period_input.valueChanged.connect(self.update_period)
 
         # Add widgets to grid layout

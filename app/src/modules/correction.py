@@ -33,7 +33,7 @@ class Correction(QFrame):
 
         # Input for Lum Threshold
         lum_thres_label = create_label("Lum Threshold" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
-        self.lum_thres_input = create_input(0, 100, 4)
+        self.lum_thres_input = create_input(0, 15, 4)
         self.lum_thres_input.valueChanged.connect(self.send_command)
         layout.addWidget(lum_thres_label)
         layout.addWidget(self.lum_thres_input)
