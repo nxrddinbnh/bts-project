@@ -1,10 +1,9 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView, QSizePolicy, QAbstractItemView
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QHBoxLayout, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem, QHeaderView
 from PyQt6.QtCore import Qt
-from PyQt6 import QtCore
 from PyQt6.QtGui import QIcon
 from services.api_service import APIService
 from base import set_module_style, create_label
-from constants import BG_OPACITY, RADIUS_100, TEXT_100, TEXT_200, PADD_200, FONT_BODY, BG_100, BG_200, FIELD_TITLES, SECONDARY, ACCENT, PRIMARY, BG_300
+from constants import BG_OPACITY, RADIUS_100, TEXT_100, PADD_200, FONT_BODY, BG_100, BG_200, SECONDARY, ACCENT, PRIMARY, VARIABLES_NAME
 
 class SearchPage(QWidget):
     def __init__(self):
@@ -160,7 +159,7 @@ class SearchPage(QWidget):
             return
         
         table = QTableWidget()
-        table.setRowCount(len(FIELD_TITLES))
+        table.setRowCount(len(VARIABLES_NAME))
         table.setColumnCount(1 + len(data))
 
         # Table settings
@@ -193,8 +192,8 @@ class SearchPage(QWidget):
         # First column (titles)
         font_bold = FONT_BODY
         font_bold.setBold(True)
-        for row_idx, key in enumerate(FIELD_TITLES.keys()):
-            item = QTableWidgetItem(FIELD_TITLES[key])
+        for row_idx, key in enumerate(VARIABLES_NAME.keys()):
+            item = QTableWidgetItem(VARIABLES_NAME[key]["title"])
             item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             item.setFont(font_bold)
             table.setItem(row_idx, 0, item)
@@ -202,7 +201,7 @@ class SearchPage(QWidget):
 
         # Columns with data
         for col_idx, record in enumerate(data, start=1):
-            for row_idx, key in enumerate(FIELD_TITLES.keys()):
+            for row_idx, key in enumerate(VARIABLES_NAME.keys()):
                 value = str(record.get(key, ""))
                 item = QTableWidgetItem(value)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)

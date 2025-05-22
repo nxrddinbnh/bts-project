@@ -31,87 +31,31 @@ CMD_CORRECT = 0x4C
 REQUEST_DATA = 0x52
 END_FRAME = 0x0D
 
-# VARIABLES FOR SOLAR PANEL CONTROL DATA
-VARIABLES_NAME = [
-    "lum_east",         # luminosity east
-    "lum_west",         # luminosity west
-    "lum_north",        # luminosity north
-    "lum_south",        # luminosity south
-    "lum_average",      # average luminosity
-    "lum_dev_az",       # luminosity deviation azimuth
-    "lum_dev_el",       # luminosity deviation elevation
-    
-    "reserved",
 
-    "volt_panel",       # solar panel voltage
-    "volt_batt",        # battery voltage
-    "curr_panel",       # solar panel current
-    "curr_batt",        # battery current
-    "charge",           # charge indicator
-    "full_charge",      # full charge indicator
-    "empty_charge",     # empty charge indicator
+# Dictionary mapping variable keys to their display titles and field lengths
+VARIABLES_NAME = {
+    "east": {"title": "east", "length": 3},                                     # luminosity east
+    "west": {"title": "west", "length": 3},                                     # luminosity west
+    "north": {"title": "north", "length": 3},                                   # luminosity north
+    "south": {"title": "south", "length": 3},                                   # luminosity south
+    "average": {"title": "average", "length": 3, "skip": 8},                    # average luminosity
+    "v_panel": {"title": "volt panel", "length": 3},                            # solar panel voltage
+    "v_battery": {"title": "volt battery", "length": 3},                        # battery voltage
+    "c_panel": {"title": "current panel", "length": 3},                         # solar panel current
+    "c_battery": {"title": "current battery", "length": 3},                     # battery current
+    "charging": {"title": "charging", "length": 2},                             # charge indicator
+    "full": {"title": "full", "length": 2},                                     # full charge indicator
+    "empty": {"title": "empty", "length": 2},                                   # empty charge indicator
 
-    "light_on",         # lighting indicator
-    "light_lvl",        # lighting level
+    "light_on": {"title": "light on", "length": 3},                             # the leds that are on
+    "light_lvl": {"title": "light level", "length": 3},                         # lighting level
 
-    "curr_m1",          # motor 1 current
-    "curr_m2",          # motor 2 current
-    "overload_el",      # overload indicator elevation
-    "overload_az",      # overload indicator azimuth
-    "moving",           # movement indicator (0 = stopped)
-    "angle_az",         # azimuth angle
-    "angle_el",         # elevation angle
-    "limit",            # stop indicator
+    "curr_elev": {"title": "current elev", "length": 3},                        # elevation motor current
+    "curr_azim": {"title": "current azim", "length": 3, "skip": 6},             # azimuth motor current
+    "angle_azim": {"title": "angle azim", "length": 3},                         # azimuth motor current
+    "angle_elev": {"title": "current elev", "length": 3, "skip": 2},            # elevation motor angle
 
-    "correction_on",    # automatic correction mode (0 = off, 1 = on)
-    "correction_int",   # correction interval (minutes)
-    "correction_thr"    # luminosity deviation threshold for correction
-]
-
-# VARIABLES LENGHT FIELD
-FIELD_LENGTHS = [
-    3, 3, 3, 3, 3, 3, 3,
-    2,
-    3, 3, 3, 3,
-    2, 2, 2,
-    3, 3, 3, 3,
-    2, 2, 2,
-    3, 3,
-    2, 2,
-    3, 3, 
-]
-
-# VARIABLES FOR THE API
-ALLOWED_KEYS = {
-    "lum_east", "lum_west", "lum_north", "lum_south", "lum_average",
-    "volt_panel", "volt_batt", "curr_panel", "curr_batt",
-    "charge", "full_charge", "empty_charge",
-    "light_on", "light_lvl",
-    "curr_m1", "curr_m2",
-    "angle_az", "angle_el",
-    "correction_on", "correction_int", "correction_thr"
-}
-
-FIELD_TITLES = {
-    "id": "ID",
-    "datetime": "DATE TIME",
-    "lum_east": "EAST",
-    "lum_west": "WEST",
-    "lum_north": "NORTH",
-    "lum_south": "SOUTH",
-    "lum_average": "AVERAGE",
-    "volt_panel": "VOLT PANEL",
-    "volt_batt": "VOLT BATTERY",
-    "curr_panel": "CURRENT PANEL",
-    "curr_batt": "CURRENT BATTERY",
-    "charge_state": "CHARGE STATE",
-    "light_on": "LEDS ON",
-    "light_lvl": "LIGHT LEVEL",
-    "curr_m1": "CURRENT ELEV",
-    "curr_m2": "CURRENT AZIM",
-    "angle_el": "ANGLE ELEV",
-    "angle_az": "ANGLE AZIM",
-    "correction_on": "AUTO MOD",
-    "correction_int": "CORRECTION INTERVAL",
-    "correction_thr": "CORRECTION THRESHOLD ",
+    "corr_mode": {"title": "mode", "length": 2},                                # automatic correction mode (0 = off, 1 = on)
+    "corr_interval": {"title": "corr. interval", "length": 3},                  # correction interval (minutes)
+    "corr_threshold": {"title": "corre. threshold", "length": 3}                # luminosity deviation threshold for correction
 }

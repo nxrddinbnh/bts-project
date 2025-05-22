@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout
 from PyQt6.QtCore import Qt
 from base import set_module_style, title_label, create_input, create_label, create_button
-from constants import FONT_BODY, PRIMARY, BG_100, TEXT_100, TEXT_200, RADIUS_100, CMD_CORRECT, VARIABLES_NAME
+from constants import FONT_BODY, PRIMARY, BG_100, TEXT_100, TEXT_200, RADIUS_100, CMD_CORRECT
 
 class Correction(QFrame):
     def __init__(self, serial_com):
@@ -11,13 +11,13 @@ class Correction(QFrame):
         """
         super().__init__()
         self.serial_com = serial_com
-        self.button_states = {"auto": False, "manual": False}
+        self.active_mode = None
         self.buttons = {}
         set_module_style(self)
         self.setup_ui()
 
-        correction_on = VARIABLES_NAME.index("correction_on")
-        self.toggle_button("auto" if correction_on else "manual")
+        self.toggle_button("auto")
+        self.send_command()
 
     def setup_ui(self):
         """Setup UI layout for the correction module"""
@@ -26,14 +26,14 @@ class Correction(QFrame):
 
         # Input for Period
         period_label = create_label("Period (min)" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
-        self.period_input = create_input(0, 15, 15)
+        self.period_input = create_input(0, 15, 10)
         self.period_input.valueChanged.connect(self.send_command)
         layout.addWidget(period_label)
         layout.addWidget(self.period_input)
 
         # Input for Lum Threshold
         lum_thres_label = create_label("Lum Threshold" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
-        self.lum_thres_input = create_input(0, 15, 4)
+        self.lum_thres_input = create_input(0, 15, 5)
         self.lum_thres_input.valueChanged.connect(self.send_command)
         layout.addWidget(lum_thres_label)
         layout.addWidget(self.lum_thres_input)
@@ -64,25 +64,15 @@ class Correction(QFrame):
         :param button_name: The ID of the button clicked
         """
         # Check if the button is already active
-        if self.button_states[button_name]:
+        if self.active_mode == button_name:
             return
         
-        # First deactivate all buttons
-        for btn in self.button_states:
-            self.button_states[btn] = False
-            self.buttons[btn].setStyleSheet(self.set_button_style(False))
-
         # Activate the selected button
-        self.button_states[button_name] = True
-        self.buttons[button_name].setStyleSheet(self.set_button_style(True))
-
-        # Update the style of all buttons
+        self.active_mode = button_name
         for btn in self.buttons:
-            if self.button_states[btn]:
-                self.buttons[btn].setStyleSheet(self.set_button_style(True))
-            else:
-                self.buttons[btn].setStyleSheet(self.set_button_style(False))
-
+            is_active = (btn == self.active_mode)
+            self.buttons[btn].setStyleSheet(self.set_button_style(is_active))
+            
         self.send_command()
 
     def get_mode(self):
@@ -90,9 +80,7 @@ class Correction(QFrame):
         Returns the current correction mode based on button state
         :return: 0 if no button is active, 1 if manual is active, 2 if auto is active
         """
-        if self.button_states["manual"]: return 0
-        elif self.button_states["auto"]: return 2
-        else: return 0
+        return 0 if self.active_mode == "manual" else 2
     
     def get_threshold(self):
         """

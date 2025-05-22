@@ -15,8 +15,10 @@ class Motor(QFrame):
         self.main_window = main_window
         self.toast_notif = ToastNotif(main_window)
         self.value_labels = {}
-        self.time_value = 1
+        self.time_value = 5
         self.setup_ui()
+        self.send_command(CMD_MOTOR_ELEV, 0, 5, True)
+        self.send_command(CMD_MOTOR_AZIM, 0, 5, True)
 
     def setup_ui(self):
         """Setup UI layout for the motor module"""
@@ -49,8 +51,8 @@ class Motor(QFrame):
         Creates a horizontal layout for a motor axis
         Returns: QHBoxLayout Layout with angle and intensity frames
         """
-        if label == "azimuth": key = "az"
-        elif label == "elevation": key = "el"
+        if label == "azimuth": key = "azim"
+        elif label == "elevation": key = "elev"
         in_key = f"intensity_{key}"
 
         layout = QHBoxLayout()
@@ -188,15 +190,22 @@ class Motor(QFrame):
         """
         if direction in ["up", "down"]:
             cmd = CMD_MOTOR_ELEV
-            current_angle = self.value_labels["el"].angle
+            current_angle = self.value_labels["elev"].angle
             if direction == "up" and current_angle >= 90:
-                self.toast_notif.show_message("max_el")
+                self.toast_notif.show_message("max_elev")
                 return
             if direction == "down" and current_angle <= 0:
-                self.toast_notif.show_message("min_el")
+                self.toast_notif.show_message("min_elev")
                 return
         else:
             cmd = CMD_MOTOR_AZIM
+            current_angle = self.value_labels["azim"].angle
+            if direction == "right" and current_angle >= 350:
+                self.toast_notif.show_message("max_azim")
+                return
+            if direction == "left" and current_angle <= 0:
+                self.toast_notif.show_message("min_azim")
+                return
             
         if direction in ["up", "right"]: dir_val = 1
         else: dir_val = 2
@@ -213,18 +222,14 @@ class Motor(QFrame):
         :param data: Parsed data
         """
         axis_map = {
-            "el": ("angle_el", "curr_m1"),
-            "az": ("angle_az", "curr_m2"),
+            "elev": ("angle_elev", "curr_elev"),
+            "azim": ("angle_azim", "curr_azim"),
         }
             
-        for key, (angle_key, intensity_key) in axis_map.items():
-            # Update gauge if exists
+        for key, (angle_key, current_key) in axis_map.items():
             if key in self.value_labels:
                 self.value_labels[key].set_angle(data.get(angle_key, 0))
 
-            # Update intensity label if exists
-            intensity_label_key = f"intensity_{key}"
-            if intensity_label_key in self.value_labels:
-                overload = data.get(intensity_key, 0)
-                self.value_labels[intensity_label_key].setText(str(overload))
+            if current_key in self.value_labels:
+                self.value_labels[current_key].setText(str(data.get(current_key, 0)))
                 

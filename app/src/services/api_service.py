@@ -1,5 +1,4 @@
 import requests
-from constants import ALLOWED_KEYS  
 
 class APIService:
     def __init__(self):
@@ -50,8 +49,7 @@ class APIService:
         :return: The API's JSON response or an error message
         """
         try:
-            filtered_data = {k: v for k, v in data.items() if k in ALLOWED_KEYS}
-            mapped_data = self.map_charge_state(filtered_data, to_api=True)
+            mapped_data = self.map_charge_state(data, to_api=True)
             response = requests.post(self.base_url, json=mapped_data, headers=self.headers, timeout=0.1)
             response.raise_for_status()
             return response.json()

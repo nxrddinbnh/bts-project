@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QSizePolicy
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QMovie
 from base import set_module_style, title_label, create_label
-from constants import BG_200, BG_OPACITY, TEXT_100, TEXT_200, FONT_BODY, FONT_BODY_B, RADIUS_100
+from constants import BG_200, BG_OPACITY, TEXT_100, TEXT_200, FONT_BODY, FONT_BODY_B, RADIUS_100, VARIABLES_NAME
 
 class Energy(QFrame):
     def __init__(self):
@@ -19,11 +19,11 @@ class Energy(QFrame):
 
         # Measurement frames
         keys_labels = [
-            ("volt_panel", "Panel (V)"),
-            ("curr_panel", "Panel (I)"),
-            ("volt_batt", "Battery (V)"),
-            ("curr_batt", "Battery (I)"),
-            ("charging_status", "Charge")
+            ("v_panel", "Panel (V)"),
+            ("c_panel", "Panel (I)"),
+            ("v_battery", "Battery (V)"),
+            ("c_battery", "Battery (I)"),
+            ("charging", "Charge Status")
         ]
 
         for key, label in keys_labels:
@@ -70,7 +70,7 @@ class Energy(QFrame):
         """
         gif_path = f"assets/gif/{gif}"
         movie = QMovie(gif_path)
-        label = self.value_labels.get("charging_status")
+        label = self.value_labels.get("charging")
         movie.setScaledSize(QSize(11, 19))
         label.setMovie(movie)
 
@@ -102,6 +102,6 @@ class Energy(QFrame):
             
         # Other mesurement labels
         for key, label in self.value_labels.items():
-            if key != "charging_status":
+            if key != "charging":
                 value = data.get(f"{key.lower()}", "0")
                 label.setText(str(value))

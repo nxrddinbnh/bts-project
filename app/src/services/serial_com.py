@@ -1,7 +1,7 @@
 import serial
 import time
 from services.api_service import APIService
-from constants import VARIABLES_NAME, FIELD_LENGTHS, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
+from constants import VARIABLES_NAME, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 
 class SerialCommunication:
     def __init__(self, serial_config, brightness_mod=None, energy_mod=None, motor_mod=None):
@@ -61,16 +61,19 @@ class SerialCommunication:
 
             if frame.startswith('FA') and frame.endswith('0D'):
                 filtered_frame = frame[2:-2] # Remove 0xFA and 0x0D
-                data_values = []
+                parsed_data = {}
                 index = 0
 
                 # Extract data according to field length
-                for length in FIELD_LENGTHS:
-                    field_value = filtered_frame[index:index + length].strip()
-                    data_values.append(field_value)
+                for key, info in VARIABLES_NAME.items():
+                    length = info["length"]
+                    value = filtered_frame[index:index + length].strip()
+                    parsed_data[key] = value
                     index += length
 
-                parsed_data = {VARIABLES_NAME[i]: data_values[i] for i in range(len(VARIABLES_NAME))}
+                    skip_len = info.get("skip", 0)
+                    index += skip_len
+
                 self.update_modules(data=parsed_data)
                 self.api_service.send_data(parsed_data) # Sends the data to the API
                 return parsed_data
@@ -169,12 +172,12 @@ class SerialCommunication:
         Update all system modules based on the latest parsed data
         :param data: Parsed data
         """
-        all_data = self.api_service.get_by_id(45)
-        print(all_data)  
-
         try:
-            self.brightness_mod.update_values(data)
-            self.energy_mod.update_values(data)
-            self.motor_mod.update_values(data)
+            if self.brightness_mod is not None: 
+                self.brightness_mod.update_values(data)
+            if self.energy_mod is not None: 
+                self.energy_mod.update_values(data)
+            if self.motor_mod is not None: 
+                self.motor_mod.update_values(data)
         except Exception as e:
             raise Exception(f"Failed to update modules: {e}")

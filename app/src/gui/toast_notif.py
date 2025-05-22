@@ -6,8 +6,10 @@ from constants import BG_100, TEXT_100, PADD_200, RADIUS_200, FONT_BODY
 class ToastNotif(QLabel):
     # Predefined toast messages
     _messages = {
-        "max_el": "Elevation is already at maximum (90°)",
-        "min_el": "Elevation is already at minimum (0°)",
+        "max_elev": "Elevation is already at maximum (90°)",
+        "min_elev": "Elevation is already at minimum (0°)",
+        "max_azim": "Azimuth is already at maximum (350°)",
+        "min_azim": "Azimuth is already at minimum (0°)",
         "mode_locked": "Cannot change mode during motor operation",
         "motor_move": "Motor is already moving. Please wait..."
     }

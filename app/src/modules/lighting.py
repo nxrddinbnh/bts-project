@@ -14,6 +14,7 @@ class Lighting(QFrame):
         self.buttons = {}
         set_module_style(self)
         self.setup_ui()
+        self.send_command()
 
     def setup_ui(self):
         """Setup UI layout for the lighting module"""
