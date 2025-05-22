@@ -52,7 +52,7 @@ class APIService:
         try:
             filtered_data = {k: v for k, v in data.items() if k in ALLOWED_KEYS}
             mapped_data = self.map_charge_state(filtered_data, to_api=True)
-            response = requests.post(self.base_url, json=mapped_data, headers=self.headers, timeout=3)
+            response = requests.post(self.base_url, json=mapped_data, headers=self.headers, timeout=0.1)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -64,7 +64,7 @@ class APIService:
         :return: The API's JSON response containing the data or an error message
         """
         try:
-            response = requests.get(self.base_url, headers=self.headers, timeout=3)
+            response = requests.get(self.base_url, headers=self.headers, timeout=0.1)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:
@@ -77,7 +77,7 @@ class APIService:
         :return: The API's JSON response with the record or an error message
         """
         try:
-            response = requests.get(f"{self.base_url}?id={id}", headers=self.headers, timeout=3)
+            response = requests.get(f"{self.base_url}?id={id}", headers=self.headers, timeout=0.1)
             response.raise_for_status()
             return response.json()
         except requests.exceptions.RequestException as e:

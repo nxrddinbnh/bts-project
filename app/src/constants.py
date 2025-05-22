@@ -91,3 +91,27 @@ ALLOWED_KEYS = {
     "angle_az", "angle_el",
     "correction_on", "correction_int", "correction_thr"
 }
+
+FIELD_TITLES = {
+    "id": "ID",
+    "datetime": "DATE TIME",
+    "lum_east": "EAST",
+    "lum_west": "WEST",
+    "lum_north": "NORTH",
+    "lum_south": "SOUTH",
+    "lum_average": "AVERAGE",
+    "volt_panel": "VOLT PANEL",
+    "volt_batt": "VOLT BATTERY",
+    "curr_panel": "CURRENT PANEL",
+    "curr_batt": "CURRENT BATTERY",
+    "charge_state": "CHARGE STATE",
+    "light_on": "LEDS ON",
+    "light_lvl": "LIGHT LEVEL",
+    "curr_m1": "CURRENT ELEV",
+    "curr_m2": "CURRENT AZIM",
+    "angle_el": "ANGLE ELEV",
+    "angle_az": "ANGLE AZIM",
+    "correction_on": "AUTO MOD",
+    "correction_int": "CORRECTION INTERVAL",
+    "correction_thr": "CORRECTION THRESHOLD ",
+}

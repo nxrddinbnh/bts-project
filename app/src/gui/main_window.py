@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QGridLayout
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QGridLayout, QStackedWidget
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from services.serial_config import SerialConfig
@@ -10,6 +10,8 @@ from modules.general import General
 from modules.energy import Energy
 from modules.correction import Correction
 from modules.motor import Motor
+from gui.home_page import HomePage
+from gui.search_page import SearchPage
 from base import load_fonts
 from constants import BG_300
 
@@ -23,16 +25,20 @@ class MainWindow(QMainWindow):
         self.serial_com = SerialCommunication(self.serial_config, self.brightness, self.energy)
         self.serial_com.connect()
 
-        self.sidebar = Sidebar()
+        # Initialize modules
         self.lighting = Lighting(self.serial_com)
         self.general = General(self.serial_com, self.serial_config)
         self.correction = Correction(self.serial_com)
         self.motor = Motor(self.serial_com, self)
         self.serial_com.motor_mod = self.motor
 
-        load_fonts()  
+        # Sidebar and stacked pages
+        self.sidebar = Sidebar()
+        self.stack = QStackedWidget()
+        self.pages = {}
+
+        load_fonts()
         self.setup_ui()
-        self.display_modules()
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
 
     def setup_ui(self):
@@ -48,29 +54,36 @@ class MainWindow(QMainWindow):
         y = (screen_geometry.height() - height) // 2
         self.setGeometry(x, y, width, height)
 
-    def display_modules(self):
-        """Display modules with a bentogrid design"""
+        # Main layout
         widget = QWidget(self)
         self.setCentralWidget(widget)
-        layout = QGridLayout()
+        layout = QHBoxLayout()
 
-        # Add modules to the grid layout
-        layout.addWidget(self.sidebar, 0, 0, 2, 1)
-        layout.addWidget(self.brightness, 0, 1, 1, 3)
-        layout.addWidget(self.lighting, 0, 4, 1, 2)
-        layout.addWidget(self.energy, 1, 1, 1, 1)
-        layout.addWidget(self.correction, 1, 2, 1, 1)
-        layout.addWidget(self.motor, 1, 3, 1, 2)
-        layout.addWidget(self.general, 1, 5, 1, 1)
-
-        layout.setColumnStretch(0, 1)
-        layout.setColumnStretch(1, 3)
-        layout.setColumnStretch(2, 3)
-        layout.setColumnStretch(3, 3)
-        layout.setColumnStretch(4, 3)
-        layout.setColumnStretch(5, 3)
-
-        layout.setRowStretch(0, 2)
-        layout.setRowStretch(1, 2)
-
+        layout.addWidget(self.sidebar)
+        layout.addWidget(self.stack)
+        layout.setStretch(0, 1)
+        layout.setStretch(1, 10)
         widget.setLayout(layout)
+
+        # Connect sidebar navigation
+        self.sidebar.navigate.connect(self.show_page)
+        self.init_pages()
+        self.show_page("home")
+
+    def init_pages(self):
+        """Initialize pages and add them to the stack"""
+        self.pages["home"] = HomePage(
+            self.brightness, self.lighting, self.energy,
+            self.correction, self.motor, self.general
+        )
+        self.pages["search"] = SearchPage()
+
+        for page in self.pages.values():
+            self.stack.addWidget(page)
+
+    def show_page(self, name):
+        """
+        Set the current page by name if it exists
+        :param name: The name of the page"""
+        if name in self.pages:
+            self.stack.setCurrentWidget(self.pages[name])

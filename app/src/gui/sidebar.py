@@ -1,10 +1,12 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QSizePolicy, QSpacerItem, QGridLayout
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QIcon
 from base import set_module_style
 from constants import BG_100, PRIMARY, TEXT_100, FONT_BODY, RADIUS_100
 
 class Sidebar(QFrame):
+    navigate = pyqtSignal(str)
+
     def __init__(self):
         """Initializes the Sidebar widget"""
         super().__init__()
@@ -17,7 +19,7 @@ class Sidebar(QFrame):
         """Sets up the sidebar layout and buttons"""
         layout = QVBoxLayout()
         nav_layout = QVBoxLayout()
-        icons = ["home", "brightness", "lighting", "energy", "motor", "correction", "cansniffer"]
+        icons = ["home", "search"]
 
         # Hamburger button
         hamb_button = self.create_button("hamburger.svg", "Menu", hide_text=True)
@@ -31,6 +33,7 @@ class Sidebar(QFrame):
         # Navigation buttons
         for icon in icons:
             button = self.create_button(f"{icon}.svg", icon.capitalize())
+            button.clicked.connect(lambda checked, name=icon: self.navigate.emit(name))
             nav_layout.addWidget(button)
             self.labeled_buttons.append(button)
         layout.addLayout(nav_layout)
@@ -109,13 +112,7 @@ class Sidebar(QFrame):
     def toggle_sidebar(self):
         """Expand or collapse sidebar and show/hide button labels"""
         self.is_expanded = not self.is_expanded
-        parent_layout = self.parentWidget().layout()
 
         # Toggle the visibility of the text button
         for button in self.labeled_buttons:
             button.text_label.setVisible(self.is_expanded)
-
-        # Adjust sidebar width dynamically
-        if isinstance(parent_layout, QGridLayout):
-            parent_layout.setColumnStretch(0, 2 if self.is_expanded else 1)
-            parent_layout.update()
