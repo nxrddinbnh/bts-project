@@ -19,41 +19,40 @@ class SerialCommunication:
 
     def connect(self):
         """Establishes a connection to the serial port"""
-        self.config = self.serial_config.get_config()
-        self.port = self.config["port"]
-        self.baudrate = self.config["baudrate"]
-        self.timeout = self.config["timeout"]
+        config = self.serial_config.get_config()
+        port = config["port"]
+        baudrate = config["baudrate"]
+        timeout = config["timeout"]
         
-        if not self.port:
+        if not port:
             print("No available serial port found")
             return
         
-        if self.serial_connection is None or not self.serial_connection.is_open:
-            try:
-                self.serial_connection = serial.Serial(
-                    port = self.port,
-                    baudrate = self.baudrate,
-                    timeout = self.timeout
-                )
-            except serial.SerialException as e:
-                raise Exception(f"Failed to connect to {self.port}: {e}")
-        else:
-            print(f"Already connected to {self.port}")
-
+        if self.serial_connection and self.serial_connection.is_open:
+            print(f"Already connected to {port}")
+            return True
+        
+        try:
+            self.serial_connection = serial.Serial(
+                port=port, baudrate=baudrate, timeout=timeout
+            )
+        except serial.SerialException as e:
+            print(f"Failed to connect to {port}: {e}")
+            return False
+        
     def disconnect(self):
         """Closes the serial connection if it's open"""
         if self.serial_connection and self.serial_connection.is_open:
             try:
                 self.serial_connection.close()
             except serial.SerialException as e:
-                raise Exception(f"Failed to disconnect from {self.port}: {e}")
-        else:
-            print(f"No active connection to {self.port} to disconnect")
+                raise Exception(f"Failed to disconnect from {self.serial_connection.port}: {e}")
 
-    def parse_data(self, data):
+    def parse_data(self, data, to_api):
         """
         Parse data received from the serial port
         :param data: Raw data received in bytes
+        :param to_api: to know if to send it to the api
         :return A dictionary containing values
         """
         try:
@@ -70,12 +69,10 @@ class SerialCommunication:
                     value = filtered_frame[index:index + length].strip()
                     parsed_data[key] = value
                     index += length
-
-                    skip_len = info.get("skip", 0)
-                    index += skip_len
+                    index += info.get("skip", 0)
 
                 self.update_modules(data=parsed_data)
-                self.api_service.send_data(parsed_data) # Sends the data to the API
+                if to_api: self.api_service.send_data(parsed_data) # Sends the data to the API
                 return parsed_data
             else:
                 print("Incomplete or invalid frame")
@@ -84,9 +81,10 @@ class SerialCommunication:
             print(f"Error parsing data: {e}")
             return None
         
-    def receive_data(self):
+    def receive_data(self, to_api):
         """
         Receives data from the serial port
+        :param to_api: to know if to send it to the api
         :return: Data received (as bytes) or None if no data is available
         """
         if not self.serial_connection:
@@ -117,17 +115,18 @@ class SerialCommunication:
 
                 # Process one complete frame at a time
                 frame = decoded[start:end + 2]
-                parsed = self.parse_data(frame.encode("ascii"))
+                parsed = self.parse_data(frame.encode("ascii"), to_api)
                 return parsed 
             return None
         except serial.SerialException as e:
             raise Exception(f"Failed to receive data: {e}")
         
-    def send_command(self, command, values=None):
+    def send_command(self, command, values=None, to_api=False):
         """
         Sends a command to the device and waits for a response
         :param command: Command to be sent to the device
         :param values: Values to be sent along with the command (optional)
+        :param to_api: to know if to send it to the api (optional)
         :return: Response from the device
         """
         if not self.serial_connection or not self.serial_connection.is_open:
@@ -165,7 +164,7 @@ class SerialCommunication:
         except serial.SerialException as e:
             raise Exception(f"Failed to send command: {e}")
 
-        return self.receive_data()
+        return self.receive_data(to_api)
     
     def update_modules(self, data):
         """
@@ -173,11 +172,8 @@ class SerialCommunication:
         :param data: Parsed data
         """
         try:
-            if self.brightness_mod is not None: 
-                self.brightness_mod.update_values(data)
-            if self.energy_mod is not None: 
-                self.energy_mod.update_values(data)
-            if self.motor_mod is not None: 
-                self.motor_mod.update_values(data)
+            if self.brightness_mod: self.brightness_mod.update_values(data)
+            if self.energy_mod: self.energy_mod.update_values(data)
+            if self.motor_mod: self.motor_mod.update_values(data)
         except Exception as e:
             raise Exception(f"Failed to update modules: {e}")

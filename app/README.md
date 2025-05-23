@@ -1,0 +1,6 @@
+- no enviar comando si hay uno ejecutandose
+- anadir modo oscuro / claro
+- conectar con la pagina kus
+- agrandar side bar al clickar hambburger
+- rellenar readme
+- cambiar logo y titulo de la app

@@ -3,7 +3,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from services.api_service import APIService
 from base import set_module_style, create_label
-from constants import BG_OPACITY, RADIUS_100, TEXT_100, PADD_200, FONT_BODY, BG_100, BG_200, SECONDARY, ACCENT, PRIMARY, VARIABLES_NAME
+from constants import BG_OPACITY, RADIUS_100, TEXT_100, PADD_200, FONT_BODY, BG_100, BG_200, SECONDARY, ACCENT, PRIMARY, TABLE_FIELDS
 
 class SearchPage(QWidget):
     def __init__(self):
@@ -14,7 +14,7 @@ class SearchPage(QWidget):
         self.setup_ui()
 
     def setup_ui(self):
-        """"""
+        """Initialize the Search page"""
         main_layout = QVBoxLayout(self)
         main_layout.setContentsMargins(0, 0, 0, 0)
         container = QWidget()
@@ -45,7 +45,7 @@ class SearchPage(QWidget):
         else: self.show_message("No data available.", SECONDARY)
 
     def crate_search_bar(self):
-        """"""
+        """Creates a search bar to show a data related to the searched id"""
         container = QWidget()
         search_layout = QHBoxLayout()
         search_layout.setSpacing(0)
@@ -87,6 +87,9 @@ class SearchPage(QWidget):
             QPushButton:hover {{
                 background-color: {BG_100};
             }}
+            QPushButton:pressed {{
+                background-color: {PRIMARY};
+            }}
         """)
 
         search_layout.addWidget(self.search_input)
@@ -95,48 +98,25 @@ class SearchPage(QWidget):
         return container
     
     def clear_area(self):
-        """"""
+        """Cleans the scrolling area"""
         while self.scroll_layout.count():
             item = self.scroll_layout.takeAt(0)
             widget = item.widget()
-            if widget:
-                widget.deleteLater()
-    
+            if widget: widget.deleteLater()
+
     def show_message(self, message, color="white"):
         """
-        :param message:
-        :param color:
+        Displays a message in the scrolling areap
+        :param message: The message to be displayed
+        :param color: The color of the message
         """
         self.clear_area()
         label = create_label(message, FONT_BODY, f"color: {color}; padding: 12px;")
         label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.scroll_layout.addWidget(label) 
 
-    def search(self):
-        """"""
-        id_text = self.search_input.text().strip()
-        if id_text == "":
-            latest = self.show_latest_records()
-            if latest: self.create_table(latest)
-            else: self.show_message("No data available.", SECONDARY)
-            return
-
-        if not id_text.isdigit():
-            self.show_message("Please enter a valid numeric ID.", SECONDARY)
-            return
-        
-        try:
-            result = self.api.get_by_id(int(id_text))
-            if result.get("success") and "data" in result and "id" in result["data"]:
-                record = self.api.map_charge_state(result["data"], to_api=False)
-                self.create_table([record])
-            else:
-                self.show_message("No results found.", TEXT_100)
-        except Exception as e:
-            self.show_message(f"Error: {str(e)}", ACCENT)
-
     def show_latest_records(self):
-        """"""
+        """Displays the last 5 data from the database"""
         try:
             result = self.api.get_all()
             if not result.get("success") or "data" not in result:
@@ -144,14 +124,36 @@ class SearchPage(QWidget):
             data = result["data"]
             if not isinstance(data, list) or not data:
                 return None
-            latest_five = data[-5:]
-            return [self.api.map_charge_state(r, to_api=False) for r in reversed(latest_five)]
+            return list(data[:5])
         except Exception as e:
             self.show_message(f"Error: {str(e)}", ACCENT)
             return None
 
+    def search(self):
+        """Allows searching by id of some data"""
+        id_text = self.search_input.text().strip()
+        if id_text == "":
+            latest = self.show_latest_records()
+            if latest: self.create_table(latest)
+            else: self.show_message("No data available.", SECONDARY)
+            return
+        
+        if not id_text.isdigit():
+            self.show_message("Please enter a valid numeric ID.", SECONDARY)
+            return
+        
+        try:
+            result = self.api.get_by_id(int(id_text))
+            if result.get("success") and result.get("data"):
+                self.create_table([result["data"]])
+            else: self.show_message("No data found for that ID.", SECONDARY)
+        except Exception as e:
+            self.show_message(f"Error: {str(e)}", ACCENT)
+
     def create_table(self, data):
         """
+        Creates a table with the data
+        :param data: The data to be displayed in the table
         """
         self.clear_area()
         if not data:
@@ -159,7 +161,7 @@ class SearchPage(QWidget):
             return
         
         table = QTableWidget()
-        table.setRowCount(len(VARIABLES_NAME))
+        table.setRowCount(len(data[0]))
         table.setColumnCount(1 + len(data))
 
         # Table settings
@@ -192,16 +194,16 @@ class SearchPage(QWidget):
         # First column (titles)
         font_bold = FONT_BODY
         font_bold.setBold(True)
-        for row_idx, key in enumerate(VARIABLES_NAME.keys()):
-            item = QTableWidgetItem(VARIABLES_NAME[key]["title"])
+        for row, key in enumerate(list(data[0].keys())):
+            item = QTableWidgetItem(TABLE_FIELDS.get(key, key).upper())
             item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             item.setFont(font_bold)
-            table.setItem(row_idx, 0, item)
-            table.setRowHeight(row_idx, 39)
-
+            table.setItem(row, 0, item)
+            table.setRowHeight(row, 39)
+        
         # Columns with data
         for col_idx, record in enumerate(data, start=1):
-            for row_idx, key in enumerate(VARIABLES_NAME.keys()):
+            for row_idx, key in enumerate(list(data[0].keys())):
                 value = str(record.get(key, ""))
                 item = QTableWidgetItem(value)
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -211,7 +213,7 @@ class SearchPage(QWidget):
         self.scroll_layout.addWidget(table)
 
     def scrollbar_style(self):
-        """"""
+        """Returns the scrollbar stylesheet"""
         return f"""
             QScrollBar:vertical {{
                 background-color: {BG_200};
