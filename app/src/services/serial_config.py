@@ -1,4 +1,5 @@
 import serial.tools.list_ports
+import concurrent.futures
 
 class SerialConfig:
     def __init__(self, baudrate=9600, timeout=1):
@@ -11,22 +12,31 @@ class SerialConfig:
         self._timeout = timeout
         self._port = self.find_highest_port()
 
+    def test_port(self, port):
+        """
+        Test ports 
+        :param port: port to test
+        :return: the port if it is available
+        """
+        try:
+            s = serial.Serial(port, timeout=0.1)
+            s.close()
+            return port
+        except (OSError, serial.SerialException):
+            return None
+
     def get_available_ports(self):
         """
         Obtain all available COM ports 
         :return: All available ports
         """
+        ports = [f"COM{i}" for i in range(1, 51)]
         available_ports = []
 
-        # COM port routing from 1 to 256
-        for i in range(1, 257):
-            port = f"COM{i}"
-            try:
-                s = serial.Serial(port)
-                s.close()
-                available_ports.append(port)
-            except (OSError, serial.SerialException):
-                pass
+        with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            results = executor.map(self.test_port, ports)
+            for result in results:
+                if result is not None: available_ports.append(result)
         return available_ports
 
     def find_highest_port(self):
@@ -34,14 +44,11 @@ class SerialConfig:
         Find the highest available serial port
         :return: The highest numbered serial port
         """
-        available_ports = self.get_available_ports()
-
-        # Find the highest COM port
-        if available_ports:
-            highest_port = max(available_ports, key=lambda p: int(p.replace("COM", "")))
-            return highest_port
-        else:
-            return None
+        ports = self.get_available_ports()
+        if ports:
+            highest = max(ports, key=lambda p: int(''.join(filter(str.isdigit, p)) or 0))
+            return highest
+        return None
 
     def set_baudrate(self, baudrate):
         """

@@ -19,7 +19,7 @@ class General(QFrame):
         # Timer to request data from the panel
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.make_request)
-        self.update_period(2000)
+        self.update_period(5000)
 
     def setup_ui(self):
         """Set up the layout and UI components for the general module"""
@@ -46,8 +46,8 @@ class General(QFrame):
         timeout_input.valueChanged.connect(self.update_timeout)
 
         # Input for Period of Measurement
-        period_label = create_label("Period (ms)" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
-        period_input = create_input(1000, 60000, 2000)
+        period_label = create_label("Period (s)" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
+        period_input = create_input(1, 60, 5)
         period_input.valueChanged.connect(self.update_period)
 
         # Add widgets to grid layout
@@ -93,7 +93,7 @@ class General(QFrame):
         Updates the measurement period in the serial configuration and sets the timer interval
         :param period: The period value for the measurement
         """
-        self.timer.setInterval(period)
+        self.timer.setInterval(period * 1000)
         self.timer.start()
 
     def reconnect(self):
