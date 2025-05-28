@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost/solarpanel/api/index.php?path='
+const API_URL = 'http://172.18.199.9/solarpanel/api/index.php?path='
 
 export async function register(email, password) {
   const response = await fetch(`${API_URL}login`, {

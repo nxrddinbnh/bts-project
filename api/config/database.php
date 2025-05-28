@@ -1,9 +1,9 @@
 <?php
 class Database {
-    private $host = "localhost";
+    private $host = "172.18.199.9";
     private $db_name = "solarpanel";
     private $username = "root";
-    private $password = "";
+    private $password = "%STS*Mauriacdb";
     public $conn;
 
     public function getConnection() {

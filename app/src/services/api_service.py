@@ -1,10 +1,9 @@
 import requests
-#172.18.199.9
 
 class APIService:
     def __init__(self):
         """Initializes the APIService with the base URL and default headers"""
-        self.base_url = "http://localhost/solarpanel/api/index.php?path=can_frames"
+        self.base_url = "http://172.18.199.9/solarpanel/api/index.php?path=can_frames"
         self.headers = {"Content-Type": "application/json"}
         self.session = requests.Session()
         self.timeout = 1
