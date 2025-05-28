@@ -9,21 +9,13 @@ class CanFrameController {
         $this->canFrame = new CanFrame($db);
     }
 
-    /**
-     * Processing HTTP request: GET, POST, PUT, DELETE
-     *
-     * @param string $method HTTP Method
-     * @param int|null $id Resource ID (optional)
-     * @param array|null $data Data received in POST or PUT (optional)
-     * @return void
-     */
     public function processRequest($method, $id = null, $data = null) {
         header('Content-Type: application/json; charset=utf-8');
         
         switch ($method) {
             case 'GET':
                 if ($id) {
-                    $result = $this->canFrame->readOne($id);
+                    $result = $this->canFrame->findById($id);
                     if ($result && $result->num_rows > 0) {
                         http_response_code(200);
                         echo json_encode($result->fetch_assoc());
@@ -32,7 +24,15 @@ class CanFrameController {
                         echo json_encode(["message" => "Data not found"]);
                     }
                 } else {
-                    $result = $this->canFrame->readAll();
+                    $filters = $_GET;
+                    unset($filters['path']);
+                    
+                    if (count($filters) > 0) {
+                        $result = $this->canFrame->findByFilters($filters);
+                    } else {
+                        $result = $this->canFrame->getAll();
+                    }
+
                     if ($result && $result->num_rows > 0) {
                         $data = [];
                         while ($row = $result->fetch_assoc()) {
@@ -60,38 +60,6 @@ class CanFrameController {
                 } else {
                     http_response_code(500);
                     echo json_encode(["message" => "Error creating data"]);
-                }
-                break;
-
-            case 'PUT':
-                if (!$id || !$data) {
-                    http_response_code(400);
-                    echo json_encode(["message" => "ID and required data"]);
-                    return;
-                }
-                $updated = $this->canFrame->update($id, $data);
-                if ($updated) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "Updated data", "id" => $id]);
-                } else {
-                    http_response_code(500);
-                    echo json_encode(["message" => "Error updating data"]);
-                }
-                break;
-
-            case 'DELETE':
-                if (!$id) {
-                    http_response_code(400);
-                    echo json_encode(["message" => "ID required to delete"]);
-                    return;
-                }
-                $deleted = $this->canFrame->delete($id);
-                if ($deleted) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "Data removed", "id" => $id]);
-                } else {
-                    http_response_code(500);
-                    echo json_encode(["message" => "Error deleting data"]);
                 }
                 break;
 

@@ -11,23 +11,53 @@ class LoginController {
     public function processRequest($method, $id = null, $data = null) {
         header('Content-Type: application/json; charset=utf-8');
 
+        // Variables seguras y opcionales
+        $email = $data['email'] ?? null;
+        $password = $data['password'] ?? null;
+        $action = $data['action'] ?? null;
+
         switch ($method) {
-            case 'POST': // Create user
-                if (!$data || !isset($data['email']) || !isset($data['password'])) {
+            case 'POST':
+                if (!$email || !$password) {
                     http_response_code(400);
                     echo json_encode(["message" => "Email and password are required"]);
                     return;
                 }
 
-                $email = $data['email'];
-                $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
-                $newId = $this->login->create($email, $password_hash);
-                if ($newId) {
-                    http_response_code(201);
-                    echo json_encode(["message" => "User created", "id" => $newId, "email" => $email]);
+                if ($action === 'register') {
+                    $existingUser = $this->login->findByEmail($email);
+                    if ($existingUser && $existingUser->num_rows > 0) {
+                        http_response_code(400);
+                        echo json_encode(["message" => "Email already exists"]);
+                        return;
+                    }
+                    $password_hash = password_hash($password, PASSWORD_DEFAULT);
+                    $newId = $this->login->create($email, $password_hash);
+                    if ($newId) {
+                        http_response_code(201);
+                        echo json_encode(["message" => "User created", "id" => $newId, "email" => $email]);
+                    } else {
+                        http_response_code(500);
+                        echo json_encode(["message" => "Failed to create user"]);
+                    }
+                } elseif ($action === 'login') {
+                    $result = $this->login->findByEmail($email);
+                    if ($result && $result->num_rows > 0) {
+                        $user = $result->fetch_assoc();
+                        if (password_verify($password, $user['password'])) {
+                            http_response_code(200);
+                            echo json_encode(["success" => true, "message" => "Login successful"]);
+                        } else {
+                            http_response_code(401);
+                            echo json_encode(["success" => false, "message" => "Invalid credentials"]);
+                        }
+                    } else {
+                        http_response_code(404);
+                        echo json_encode(["success" => false, "message" => "User not found"]);
+                    }
                 } else {
-                    http_response_code(500);
-                    echo json_encode(["message" => "Failed to create user"]);
+                    http_response_code(400);
+                    echo json_encode(["message" => "Invalid action"]);
                 }
                 break;
 
@@ -42,53 +72,28 @@ class LoginController {
                         http_response_code(404);
                         echo json_encode(["message" => "User not found"]);
                     }
+                } elseif ($email) {
+                    $result = $this->login->findByEmail($email);
+                    if ($result && $result->num_rows > 0) {
+                        $user = $result->fetch_assoc();
+                        unset($user['password']);
+                        http_response_code(200);
+                        echo json_encode($user);
+                    } else {
+                        http_response_code(404);
+                        echo json_encode(["message" => "User not found"]);
+                    }
                 } else {
-                    $result = $this->login->getAllUsers();
+                    $result = $this->login->getAll();
                     $users = [];
-                    while ($row = $result->fetch_assoc()) {
-                        $users[] = $row;
+                    if ($result && $result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            unset($row['password']);
+                            $users[] = $row;
+                        }
                     }
                     http_response_code(200);
                     echo json_encode($users);
-                }
-                break;
-
-            case 'PUT':
-                if (!$id) {
-                    http_response_code(400);
-                    echo json_encode(["message" => "User ID is required for update"]);
-                    return;
-                }
-                if (!$data || !isset($data['email'])) {
-                    http_response_code(400);
-                    echo json_encode(["message" => "Email is required for update"]);
-                    return;
-                }
-
-                $email = $data['email'];
-                $password_hash = isset($data['password']) ? password_hash($data['password'], PASSWORD_DEFAULT) : null;
-
-                if ($this->login->update($id, $email, $password_hash)) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "User updated"]);
-                } else {
-                    http_response_code(500);
-                    echo json_encode(["message" => "Failed to update user"]);
-                }
-                break;
-
-            case 'DELETE':
-                if (!$id) {
-                    http_response_code(400);
-                    echo json_encode(["message" => "User ID is required for deletion"]);
-                    return;
-                }
-                if ($this->login->delete($id)) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "User deleted"]);
-                } else {
-                    http_response_code(500);
-                    echo json_encode(["message" => "Failed to delete user"]);
                 }
                 break;
 

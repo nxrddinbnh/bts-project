@@ -1,5 +1,4 @@
 <?php
-// Model for the can_frames table
 class CanFrame {
     private $conn;
     private $table_name = "can_frames";
@@ -31,17 +30,57 @@ class CanFrame {
     }
 
     // Get all the records sorted by descending date
-    public function readAll() {
+    public function getAll() {
         $sql = "SELECT * FROM " . $this->table_name . " ORDER BY date DESC";
         $result = $this->conn->query($sql);
         return $result;
     }
 
     // Get a record by ID
-    public function readOne($id) {
+    public function findById($id) {
         $sql = "SELECT * FROM " . $this->table_name . " WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    // Get a record by filters
+    public function findByFilters($filters) {
+        $sql = "SELECT * FROM " . $this->table_name;
+        $params = [];
+        $types = '';
+
+        if (count($filters) > 0) {
+            $conditions = [];
+            foreach ($filters as $key => $value) {
+                if (property_exists($this, $key)) {
+                    $conditions[] = "$key = ?";
+
+                    if ($key === 'charge_state') {
+                        $types .= 's';
+                        $params[] = $value;
+                    } else {
+                        // Para valores numéricos o nulos
+                        $types .= 'i';
+                        $params[] = (int)$value;
+                    }
+                }
+            }
+            if (count($conditions) > 0) {
+                $sql .= " WHERE " . implode(' AND ', $conditions);
+            }
+        }
+
+        $sql .= " ORDER BY date DESC";
+
+        $stmt = $this->conn->prepare($sql);
+        if (!$stmt) return false;
+
+        if (count($params) > 0) {
+            $stmt->bind_param($types, ...$params);
+        }
+
         $stmt->execute();
         return $stmt->get_result();
     }
@@ -53,33 +92,11 @@ class CanFrame {
         if (!$stmt) return false;
 
         $stmt->bind_param(
-            "iiiiiiiiiisisiiiii",
+            "iiiiiiiissiiiiiiiii",
             $data['east'], $data['west'], $data['north'], $data['average'], $data['v_panel'], $data['v_battery'], $data['c_panel'], $data['c_battery'], $data['charge_state'], $data['light_on'], $data['light_lvl'], $data['curr_elev'], $data['curr_azim'], $data['angle_azim'], $data['angle_elev'], $data['corr_mode'], $data['corr_interval'], $data['corr_threshold']
         );
 
         return $stmt->execute() ? $this->conn->insert_id : false;
-    }
-
-    // Update an existing record by ID
-    public function update($id, $data) {
-        $sql = "UPDATE " . $this->table_name . " SET date=NOW(), east=?, west=?, north=?, average=?, v_panel=?, v_battery=?, c_panel=?, c_battery=?, charge_state=?, light_on=?, light_lvl=?, curr_elev=?, curr_azim=?, angle_azim=?, angle_elev=?, corr_mode=?, corr_interval=?, corr_threshold=? WHERE id=?";
-        $stmt = $this->conn->prepare($sql);
-        if (!$stmt) return false;
-
-        $stmt->bind_param(
-            "iiiiiiiiiisisiiiiii",
-            $data['east'], $data['west'], $data['north'], $data['average'], $data['v_panel'], $data['v_battery'], $data['c_panel'], $data['c_battery'], $data['charge_state'], $data['light_on'], $data['light_lvl'], $data['curr_elev'], $data['curr_azim'], $data['angle_azim'], $data['angle_elev'], $data['corr_mode'], $data['corr_interval'], $data['corr_threshold'], $id
-        );
-
-        return $stmt->execute();
-    }
-
-    // Delete a record by ID
-    public function delete($id) {
-        $sql = "DELETE FROM " . $this->table_name . " WHERE id = ?";
-        $stmt = $this->conn->prepare($sql);
-        $stmt->bind_param("i", $id);
-        return $stmt->execute();
     }
 }
 ?>

@@ -21,7 +21,7 @@ class Login {
     }
 
     // Get all users without passwords
-    public function getAllUsers() {
+    public function getAll() {
         $sql = "SELECT id, email FROM " . $this->table_name;
         $stmt = $this->conn->prepare($sql);
         $stmt->execute();
@@ -33,6 +33,15 @@ class Login {
         $sql = "SELECT id, email FROM " . $this->table_name . " WHERE id = ?";
         $stmt = $this->conn->prepare($sql);
         $stmt->bind_param("i", $id);
+        $stmt->execute();
+        return $stmt->get_result();
+    }
+
+    // Get user by email
+    public function findByEmail($email) {
+        $sql = "SELECT * FROM " . $this->table_name . " WHERE email = ?";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("s", $email);
         $stmt->execute();
         return $stmt->get_result();
     }
