@@ -31,7 +31,6 @@ CMD_CORRECT = 0x4C
 REQUEST_DATA = 0x52
 END_FRAME = 0x0D
 
-
 # Dictionary mapping variable keys to their field lengths
 VARIABLES_NAME = {
     "east": {"length": 3},                              # luminosity east

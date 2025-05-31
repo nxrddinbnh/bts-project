@@ -20,7 +20,7 @@ class APIService:
         elif data.get("empty") == "1": charge_state = "empty"
         else: charge_state = "unknown"
 
-        for key in ["charge", "full_charge", "empty_charge"]:
+        for key in ["charging", "full", "empty"]:
             result.pop(key, None)
 
         result["charge_state"] = charge_state

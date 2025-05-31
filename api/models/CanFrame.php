@@ -92,7 +92,7 @@ class CanFrame {
         if (!$stmt) return false;
 
         $stmt->bind_param(
-            "iiiiiiiissiiiiiiiii",
+            "iiiiiiiisiiiiiiiii",
             $data['east'], $data['west'], $data['north'], $data['average'], $data['v_panel'], $data['v_battery'], $data['c_panel'], $data['c_battery'], $data['charge_state'], $data['light_on'], $data['light_lvl'], $data['curr_elev'], $data['curr_azim'], $data['angle_azim'], $data['angle_elev'], $data['corr_mode'], $data['corr_interval'], $data['corr_threshold']
         );
 

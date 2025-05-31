@@ -19,7 +19,7 @@ class General(QFrame):
         # Timer to request data from the panel
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.make_request)
-        self.update_period(5000)
+        self.update_period(1)
 
     def setup_ui(self):
         """Set up the layout and UI components for the general module"""
@@ -47,7 +47,7 @@ class General(QFrame):
 
         # Input for Period of Measurement
         period_label = create_label("Period (s)" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
-        period_input = create_input(1, 60, 5)
+        period_input = create_input(1, 60, 1)
         period_input.valueChanged.connect(self.update_period)
 
         # Add widgets to grid layout
@@ -107,6 +107,6 @@ class General(QFrame):
     def make_request(self):
         """Request data from the panel depending on the period"""
         try:
-            self.serial_com.send_command(REQUEST_DATA)
+            self.serial_com.send_command(REQUEST_DATA, to_api=True)
         except Exception as e:
             print(f"Error during request: {e}")
