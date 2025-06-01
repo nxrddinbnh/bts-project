@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QFrame, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QSizePolicy, QSpacerItem, QGridLayout
+from PyQt6.QtWidgets import QFrame, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QSizePolicy, QSpacerItem
 from PyQt6.QtCore import Qt, QSize, pyqtSignal
 from PyQt6.QtGui import QIcon
 from base import set_module_style

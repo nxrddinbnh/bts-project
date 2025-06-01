@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QGridLayout, QStackedWidget
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QIcon
 from services.serial_config import SerialConfig

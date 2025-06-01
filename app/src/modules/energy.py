@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QFrame, QVBoxLayout, QHBoxLayout, QSizePolicy
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QMovie
 from base import set_module_style, title_label, create_label
-from constants import BG_200, BG_OPACITY, TEXT_100, TEXT_200, FONT_BODY, FONT_BODY_B, RADIUS_100, VARIABLES_NAME
+from constants import BG_200, BG_OPACITY, TEXT_100, TEXT_200, FONT_BODY, FONT_BODY_B, RADIUS_100
 
 class Energy(QFrame):
     def __init__(self):
@@ -90,9 +90,9 @@ class Energy(QFrame):
         Updates all displayed values
         :param data: Dictionary containing values
         """
-        charge = data.get("charge", 0)
-        full_charge = data.get("full_charge", 0)
-        empty_charge = data.get("empty_charge", 0)
+        charge = data.get("charging", 0)
+        full_charge = data.get("full", 0)
+        empty_charge = data.get("empty", 0)
 
         # Charge status label
         if full_charge == 1: self.set_charge_gif("full_charge.gif")
