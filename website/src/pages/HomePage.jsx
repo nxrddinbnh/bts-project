@@ -1,4 +1,3 @@
-// src/pages/HomePage.jsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { fetchCanFrames } from '../services/apiService';
@@ -9,7 +8,14 @@ export default function HomePage() {
     const [filters, setFilters] = useState([]);
     const [searchField, setSearchField] = useState("id");
     const [searchValue, setSearchValue] = useState("");
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'dark');
     const navigate = useNavigate();
+
+    useEffect(() => {
+        // Appliquer le thème sur la racine HTML
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }, [theme]);
 
     useEffect(() => {
         const filterObj = filters.reduce((acc, { field, value }) => {
@@ -39,6 +45,10 @@ export default function HomePage() {
         navigate('/');
     };
 
+    const toggleTheme = () => {
+        setTheme(theme === 'dark' ? 'light' : 'dark');
+    };
+
     return (
         <MainPage
             data={data}
@@ -50,6 +60,10 @@ export default function HomePage() {
             setSearchValue={setSearchValue}
             addFilter={addFilter}
             onLogout={handleLogout}
+            theme={theme}
+            toggleTheme={toggleTheme}
+            exportData={data}
         />
+        
     );
 }

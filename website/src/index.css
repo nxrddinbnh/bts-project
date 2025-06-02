@@ -97,13 +97,11 @@ body {
   position: relative;
 }
 
-/* Header title */
 .header h1 {
   margin: 0;
   font-size: 1.5rem;
 }
 
-/* Profile icon */
 .profile-icon {
   width: 40px;
   height: 40px;
@@ -119,7 +117,6 @@ body {
   position: relative;
 }
 
-/* Profile dropdown container */
 .profile-dropdown {
   position: absolute;
   top: 50px;
@@ -172,7 +169,6 @@ body {
   align-items: center;
 }
 
-/* Igual altura para select e input */
 .filters select,
 .filters input[type="text"],
 .filters button {
@@ -186,22 +182,7 @@ body {
   box-sizing: border-box;
   transition: background-color 0.3s ease, border 0.3s ease;
   appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
   cursor: pointer;
-}
-
-.filters select {
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--text-100) 50%),
-    linear-gradient(135deg, var(--text-100) 50%, transparent 50%),
-    linear-gradient(to right, var(--bg-opacity), var(--bg-opacity));
-  background-position:
-    calc(100% - 20px) calc(1em + 2px),
-    calc(100% - 15px) calc(1em + 2px),
-    calc(100% - 25px) 0.5em;
-  background-size: 5px 5px, 5px 5px, 1px 1.5em;
-  background-repeat: no-repeat;
 }
 
 .filters select:hover {
@@ -216,7 +197,6 @@ body {
   background-color: var(--primary-dark);
 }
 
-/* Filter tags container */
 .filter-list {
   display: flex;
   gap: 6px;
@@ -224,7 +204,6 @@ body {
   margin-bottom: 12px;
 }
 
-/* Filter pills redesigned */
 .filter-pill {
   background-color: var(--primary);
   color: var(--text-100);
@@ -250,7 +229,6 @@ body {
   justify-content: center;
 }
 
-/* Table styles */
 .data-table {
   border-collapse: collapse;
   width: 100%;
@@ -277,7 +255,6 @@ body {
   background-color: var(--bg-opacity);
 }
 
-/* Buttons */
 button {
   cursor: pointer;
   border: none;
@@ -305,14 +282,6 @@ button:hover:not(:disabled) {
   background-color: var(--primary-dark);
 }
 
-/* Pagination buttons smaller */
-.filters button,
-.filters select,
-.filters input[type="text"] {
-  font-size: 0.95rem;
-}
-
-/* Scrollbar for content box */
 .content-box::-webkit-scrollbar {
   width: 8px;
 }
@@ -327,7 +296,6 @@ button:hover:not(:disabled) {
   border-radius: 4px;
 }
 
-/* Responsive for smaller screens */
 @media (max-width: 600px) {
   .dashboard {
     grid-template-columns: 1fr;
@@ -340,7 +308,6 @@ button:hover:not(:disabled) {
   }
 }
 
-/* === Auth Form === */
 .auth-form-wrapper {
   background-color: var(--bg-200);
   padding: 32px;
@@ -409,3 +376,219 @@ button:hover:not(:disabled) {
 .auth-footer button:hover {
   color: var(--accent);
 }
+
+:root[data-theme='light'] {
+  --primary: #4a90e2;
+  --primary-dark: #357ABD;
+  --secondary: #F3C359;
+  --accent: #FE474A;
+  --bg-100: #F5F7FA;
+  --bg-200: #FFFFFF;
+  --bg-300: #E1E8F0;
+  --bg-opacity: rgba(229, 232, 240, 0.6);
+  --text-100: #1F2937;
+  --text-200: #4B5563;
+  --font-main: 'Lato', sans-serif;
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.switch .slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--primary);
+  border-radius: 26px;
+  transition: background-color 0.3s ease;
+}
+
+.switch .slider::before {
+  content: "";
+  position: absolute;
+  height: 22px;
+  width: 22px;
+  left: 2px;
+  bottom: 2px;
+  background-color: var(--bg-300);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.switch input:checked + .slider::before {
+  transform: translateX(24px);
+}
+
+.switch input:checked + .slider {
+  background-color: var(--secondary);
+}
+
+.switch .icon {
+  position: absolute;
+  top: 45%;
+  left: 3px;
+  transform: translateY(-50%);
+  font-size: 14px;
+  pointer-events: none;
+  transition: left 0.3s ease;
+  color: var(--text-100);
+  user-select: none;
+}
+
+.switch input:checked ~ .icon {
+  left: 28px;
+}
+
+.theme-button-container {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 1000;
+}
+
+.sidebar-link {
+  color: var(--text-100);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 0;
+  cursor: pointer;
+}
+
+.sidebar-link:hover {
+  color: var(--accent);
+}
+
+
+.profile-container {
+  position: relative;
+  display: inline-block;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: var(--text-100);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  position: relative; /* Garde le bouton fixe */
+  z-index: 10; /* au-dessus du fond */
+}
+
+.profile-menu {
+  position: absolute;
+  top: 100%; /* en dessous du bouton */
+  right: 0;
+  margin-top: 8px; /* un petit espace sous le bouton */
+  background-color: var(--bg-200);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  padding: 12px 16px;
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--text-100);
+  font-size: 0.9rem;
+  user-select: none;
+  z-index: 1000; /* devant tout */
+}
+
+.profile-menu .user-email {
+  font-weight: 600;
+  color: var(--secondary);
+  word-break: break-word;
+}
+
+.profile-menu button {
+  background-color: var(--primary);
+  border: none;
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--text-100);
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color 0.3s ease;
+}
+
+.profile-menu button:hover {
+  background-color: var(--primary-dark);
+}
+
+.sidebar-link {
+  display: block;
+  color: var(--text-100);
+  padding: 8px 0;
+  text-decoration: none;
+  font-size: 1rem;
+}
+
+.sidebar-link:hover {
+  color: var(--accent);
+}
+
+/* === index.css === */
+
+/* Style pour UserListPage */
+.bento-card {
+  background-color: var(--BG_200);
+  color: var(--TEXT_100);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  height: 100%;
+  overflow-y: auto;
+}
+
+.bento-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+  color: var(--TEXT_100);
+}
+
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background-color: var(--BG_100);
+}
+
+.styled-table th, .styled-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--BG_300);
+}
+
+.styled-table th {
+  background-color: var(--BG_200);
+  color: var(--TEXT_200);
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+.styled-table tbody tr:hover {
+  background-color: var(--BG_OPACITY);
+}
+
+
