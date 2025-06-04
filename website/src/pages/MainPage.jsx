@@ -15,7 +15,6 @@ export default function MainPage({
   onLogout,
   theme,       // reçu depuis App
   toggleTheme, // reçu depuis App
-  exportData,
 }) {
   return (
     <div className="dashboard">

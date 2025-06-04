@@ -23,10 +23,10 @@ export default function AuthForm() {
     setLoading(true);
     try {
       if (mode === 'login') {
-        await login(email, password); // Llama al servicio real
+        await login(email, password); 
         authLogin();
       } else if (mode === 'register') {
-        await register(email, password); // Llama al servicio real
+        await register(email, password); 
         alert('Registration successful');
         setMode('login');
       } else {
