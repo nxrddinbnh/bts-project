@@ -60,7 +60,7 @@ class Sidebar(QFrame):
         button = QPushButton()
         button.setCursor(Qt.CursorShape.PointingHandCursor)
         button.setStyleSheet(self.set_button_style(is_login))
-        button_layout = QHBoxLayout()
+        button_layout = QHBoxLayout(button)
         button_layout.setAlignment(Qt.AlignmentFlag.AlignLeft if self.is_expanded else Qt.AlignmentFlag.AlignCenter)
 
         # Icon label
@@ -78,7 +78,7 @@ class Sidebar(QFrame):
                                      if not hide_text else "background-color: none; color: transparent;") # Align the hamb icon with the other icons
             text_label.setFont(FONT_BODY)
             button_layout.addWidget(text_label)
-            button.text_label = text_label
+            button.setProperty("text_label", text_label)
 
         button.setLayout(button_layout)
         return button
@@ -115,4 +115,5 @@ class Sidebar(QFrame):
 
         # Toggle the visibility of the text button
         for button in self.labeled_buttons:
-            button.text_label.setVisible(self.is_expanded)
+            text_label = button.property("text_label")
+            if text_label: text_label.setVisible(self.is_expanded)

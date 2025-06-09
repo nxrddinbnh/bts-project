@@ -143,19 +143,19 @@ class SerialCommunication:
                     self.serial_connection.write(str(button_command).zfill(2).encode('ascii'))
                     self.serial_connection.write(str(brightness_level).zfill(2).encode('ascii'))
             elif command == CMD_CORRECT:
-                mode, threshold, period = values[0], values[1], values[2]
+                if values: mode, threshold, period = values[0], values[1], values[2]
                 self.serial_connection.write(bytes([command]))
                 self.serial_connection.write(str(mode).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(threshold).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(period).zfill(2).encode('ascii'))
             elif command == CMD_MOTOR_ELEV:
-                direction, duration, park = values[0], values[1], values[2]
+                if values: direction, duration, park = values[0], values[1], values[2]
                 self.serial_connection.write(bytes([command]))
                 self.serial_connection.write(str(direction).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(duration).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(park).zfill(1).encode('ascii'))
             elif command == CMD_MOTOR_AZIM:
-                direction, duration, park = values[0], values[1], values[2]
+                if values: direction, duration, park = values[0], values[1], values[2]
                 self.serial_connection.write(bytes([command]))
                 self.serial_connection.write(str(direction).zfill(2).encode('ascii'))
                 self.serial_connection.write(str(duration).zfill(2).encode('ascii'))

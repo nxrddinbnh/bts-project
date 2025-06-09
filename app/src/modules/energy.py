@@ -72,7 +72,7 @@ class Energy(QFrame):
         movie = QMovie(gif_path)
         label = self.value_labels.get("charging")
         movie.setScaledSize(QSize(11, 19))
-        label.setMovie(movie)
+        if label: label.setMovie(movie)
 
         # Create a dictionary that maps each GIF filename to a tooltip string.
         tooltips = {
@@ -81,7 +81,7 @@ class Energy(QFrame):
             "empty_charge.gif": "Battery Low",
             "error.gif": "Status Unknown",
         }
-        label.setToolTip(tooltips.get(gif, "Battery status"))
+        if label: label.setToolTip(tooltips.get(gif, "Battery status"))
 
         movie.start()
   

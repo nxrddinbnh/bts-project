@@ -101,7 +101,7 @@ class SearchPage(QWidget):
         """Cleans the scrolling area"""
         while self.scroll_layout.count():
             item = self.scroll_layout.takeAt(0)
-            widget = item.widget()
+            if item: widget = item.widget()
             if widget: widget.deleteLater()
 
     def show_message(self, message, color="white"):
@@ -165,17 +165,27 @@ class SearchPage(QWidget):
         table.setColumnCount(1 + len(data))
 
         # Table settings
-        table.horizontalHeader().setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
         table.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         table.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         table.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
         table.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
-        table.verticalHeader().setVisible(False)
-        table.horizontalHeader().setVisible(False)
         table.setShowGrid(False)
         table.setAlternatingRowColors(True)
         table.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        table.viewport().setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
+
+        header_h = table.horizontalHeader()
+        header_v = table.verticalHeader()
+        viewport = table.viewport()
+
+        if header_h:
+            header_h.setSectionResizeMode(QHeaderView.ResizeMode.Stretch)
+            header_h.setVisible(False)
+
+        if header_v:
+            header_v.setVisible(False)
+
+        if viewport:
+            viewport.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents, False)
 
         table.setStyleSheet(f"""
             QTableWidget {{
@@ -195,7 +205,7 @@ class SearchPage(QWidget):
         font_bold = FONT_BODY
         font_bold.setBold(True)
         for row, key in enumerate(list(data[0].keys())):
-            item = QTableWidgetItem(TABLE_FIELDS.get(key, key).upper())
+            item = QTableWidgetItem(str(TABLE_FIELDS.get(key, key)).upper())
             item.setTextAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
             item.setFont(font_bold)
             table.setItem(row, 0, item)

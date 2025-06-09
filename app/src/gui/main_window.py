@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget, QApplication
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QIcon
 from services.serial_config import SerialConfig
 from modules.brightness import Brightness
@@ -41,6 +41,7 @@ class MainWindow(QMainWindow):
         load_fonts()
         self.setup_ui()
         self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        QTimer.singleShot(0, self.center_window)
 
     def setup_ui(self):
         """Configure the UI layout of the main window"""
@@ -48,12 +49,12 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f"background-color: {BG_300};")
         self.setWindowIcon(QIcon("assets/logo.svg"))
 
-        # Sets the size and position of the window in the center of the screen
-        width, height = 1280, 720
-        screen_geometry = self.screen().geometry()
-        x = (screen_geometry.width() - width) // 2
-        y = (screen_geometry.height() - height) // 2
-        self.setGeometry(x, y, width, height)
+        
+        # width, height = 1280, 720
+        # screen_geometry = self.screen().geometry()
+        # x = (screen_geometry.width() - width) // 2
+        # y = (screen_geometry.height() - height) // 2
+        # self.setGeometry(x, y, width, height)
 
         # Main layout
         widget = QWidget(self)
@@ -88,3 +89,14 @@ class MainWindow(QMainWindow):
         :param name: The name of the page"""
         if name in self.pages:
             self.stack.setCurrentWidget(self.pages[name])
+
+    def center_window(self):
+        """Sets the size and position of the window in the center of the screen"""
+        screen = QApplication.primaryScreen()
+        if screen: 
+            screen_geometry = screen.geometry()
+            width, height = 1280, 720
+            x = (screen_geometry.width() - width) // 2
+            y = (screen_geometry.height() - height) // 2
+            self.setGeometry(x, y, width, height)
+            
