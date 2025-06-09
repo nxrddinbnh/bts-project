@@ -50,7 +50,8 @@ VARIABLES_NAME = {
     "light_lvl": {"length": 3},                         # lighting level
 
     "curr_elev": {"length": 3},                         # elevation motor current
-    "curr_azim": {"length": 3, "skip": 6},              # azimuth motor current
+    "curr_azim": {"length": 3, "skip": 4},              # azimuth motor current
+    "motor_on": {"length": 2},                          # motor movement indicator
     "angle_azim": {"length": 3},                        # azimuth motor current
     "angle_elev": {"length": 3, "skip": 2},             # elevation motor angle
 

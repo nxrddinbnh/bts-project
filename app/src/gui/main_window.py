@@ -28,7 +28,8 @@ class MainWindow(QMainWindow):
         # Initialize modules
         self.lighting = Lighting(self.serial_com)
         self.general = General(self.serial_com, self.serial_config)
-        self.correction = Correction(self.serial_com)
+        self.correction = Correction(self.serial_com, self)
+        self.serial_com.correction_mod = self.correction
         self.motor = Motor(self.serial_com, self)
         self.serial_com.motor_mod = self.motor
 

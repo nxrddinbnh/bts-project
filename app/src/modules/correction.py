@@ -1,17 +1,21 @@
 from PyQt6.QtWidgets import QFrame, QVBoxLayout
 from PyQt6.QtCore import Qt
+from gui.toast_notif import ToastNotif
 from base import set_module_style, title_label, create_input, create_label, create_button
 from constants import FONT_BODY, PRIMARY, BG_100, TEXT_100, TEXT_200, RADIUS_100, CMD_CORRECT
 
 class Correction(QFrame):
-    def __init__(self, serial_com):
+    def __init__(self, serial_com, main_window):
         """
         Initializes the Correction widget
         :serial_com: SerialCommunication instance for handling communication
         """
         super().__init__()
         self.serial_com = serial_com
+        self.main_window = main_window
+        self.toast_notif = ToastNotif(main_window)
         self.active_mode = None
+        self.is_moving = False
         self.buttons = {}
         set_module_style(self)
         self.setup_ui()
@@ -63,6 +67,11 @@ class Correction(QFrame):
         Toggles button state and slider status
         :param button_name: The ID of the button clicked
         """
+        # Do not change if motor is in motion
+        if self.is_moving:
+            self.toast_notif.show_message("mode_locked")
+            return
+        
         # Check if the button is already active
         if self.active_mode == button_name:
             return

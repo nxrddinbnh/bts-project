@@ -53,7 +53,7 @@ class Motor(QFrame):
         """
         if label == "azimuth": key = "azim"
         elif label == "elevation": key = "elev"
-        in_key = f"intensity_{key}"
+        in_key = f"curr_{key}"
 
         layout = QHBoxLayout()
         layout.addWidget(self.create_frame(key, label, is_gauge=True), stretch=2)

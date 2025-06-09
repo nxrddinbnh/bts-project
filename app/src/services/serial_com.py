@@ -4,7 +4,7 @@ from services.api_service import APIService
 from constants import VARIABLES_NAME, CMD_LIGHT, CMD_MOTOR_ELEV, CMD_MOTOR_AZIM, CMD_CORRECT, REQUEST_DATA, END_FRAME
 
 class SerialCommunication:
-    def __init__(self, serial_config, brightness_mod=None, energy_mod=None, motor_mod=None):
+    def __init__(self, serial_config, brightness_mod=None, energy_mod=None, correction_mod=None, motor_mod=None):
         """
         Initializes the serial communication using the settings from SerialConfig
         :param serial_config: To get the serial configuration
@@ -14,6 +14,7 @@ class SerialCommunication:
         self.serial_connection = None
         self.brightness_mod = brightness_mod
         self.energy_mod = energy_mod
+        self.correction_mod = correction_mod
         self.motor_mod = motor_mod
         self.api_service = APIService()
 
@@ -57,7 +58,8 @@ class SerialCommunication:
         """
         try:
             frame = data.decode('ascii').strip()
-
+            # print(f"trame: {frame}")
+            
             if frame.startswith('FA') and frame.endswith('0D'):
                 filtered_frame = frame[2:-2] # Remove 0xFA and 0x0D
                 parsed_data = {}
@@ -73,6 +75,7 @@ class SerialCommunication:
 
                 self.update_modules(data=parsed_data)
                 if to_api: self.api_service.send_data(parsed_data) # Sends the data to the API
+                # print(parsed_data)
                 return parsed_data
             else:
                 print("Incomplete or invalid frame")
@@ -174,6 +177,8 @@ class SerialCommunication:
         try:
             if self.brightness_mod: self.brightness_mod.update_values(data)
             if self.energy_mod: self.energy_mod.update_values(data)
+            if self.correction_mod and "motor_on" in data: 
+                self.correction_mod.is_moving = (data["motor_on"] == "01")
             if self.motor_mod: self.motor_mod.update_values(data)
         except Exception as e:
             raise Exception(f"Failed to update modules: {e}")
