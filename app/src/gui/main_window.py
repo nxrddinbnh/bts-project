@@ -49,13 +49,6 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(f"background-color: {BG_300};")
         self.setWindowIcon(QIcon("assets/logo.svg"))
 
-        
-        # width, height = 1280, 720
-        # screen_geometry = self.screen().geometry()
-        # x = (screen_geometry.width() - width) // 2
-        # y = (screen_geometry.height() - height) // 2
-        # self.setGeometry(x, y, width, height)
-
         # Main layout
         widget = QWidget(self)
         self.setCentralWidget(widget)

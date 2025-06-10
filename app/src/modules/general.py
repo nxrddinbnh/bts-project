@@ -20,7 +20,7 @@ class General(QFrame):
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.make_request)
         self.update_period(1)
-
+        
     def setup_ui(self):
         """Set up the layout and UI components for the general module"""
         layout = QVBoxLayout(self)
@@ -30,9 +30,10 @@ class General(QFrame):
         # ComboBox for available ports
         port_label = create_label("Port", FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
         available_ports = [self.serial_config.get_config()["port"]] + self.serial_config.get_available_ports()
+        self.port_combo = create_combo(available_ports, self.serial_config.get_config()["port"])
         available_ports.sort(key=lambda p: int(p.replace("COM", "")))  # Order the ports numerically
-        port_combo = create_combo(available_ports, self.serial_config.get_config()["port"])
-        port_combo.currentTextChanged.connect(self.update_port)
+        self.port_combo.currentTextChanged.connect(self.update_port)
+        self.port_combo.view().window().installEventFilter(self)
 
         # ComboBox for baudrates
         baud_label = create_label("Baud Rate" , FONT_BODY, f"padding: 0; color: {TEXT_200};", Qt.AlignmentFlag.AlignLeft)
@@ -52,7 +53,7 @@ class General(QFrame):
 
         # Add widgets to grid layout
         grid.addWidget(port_label, 0, 0)
-        grid.addWidget(port_combo, 1, 0)
+        grid.addWidget(self.port_combo, 1, 0)
         grid.addWidget(baud_label, 2, 0)
         grid.addWidget(baud_combo, 3, 0)
         grid.addWidget(timeout_label, 4, 0)
@@ -63,6 +64,37 @@ class General(QFrame):
         layout.addLayout(grid)
         layout.addStretch()
         self.setLayout(layout)
+
+    def update_ports_list(self, combo):
+        """
+        Updates the list of available COM ports in the combo box
+        :param combo: Te combobox to update
+        """
+        available_ports = [self.serial_config.get_config()["port"]] + self.serial_config.get_available_ports()
+        available_ports.sort(key=lambda p: int(p.replace("COM", "")))  # Order the ports numerically
+        
+        combo.blockSignals(True)
+        combo.clear()
+        for port in available_ports:
+            combo.addItem(port)
+        combo.blockSignals(False)
+
+        combo.setCurrentText(self.serial_config.get_config()["port"])
+
+    def eventFilter(self, obj, event):
+        """
+        Event filter to detect when the ports combo box is opened
+        :param obj (QObject): The object that generated the event
+        :param event: (QEvent): The event that occurred
+        :return: True if the event was handled, False otherwise
+            
+        This method detects when the ports combo box is opened and updates
+        the list of available ports before showing the dropdown.
+        """
+        if obj == self.port_combo.view().window() and event.type() == event.Type.Show:
+            self.update_ports_list(self.port_combo)
+            return True
+        return False
 
     def update_port(self, port):
         """

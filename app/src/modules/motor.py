@@ -188,29 +188,33 @@ class Motor(QFrame):
         Handles directional button commands
         :param direction: up, down, left or right
         """
-        if direction in ["up", "down"]:
-            cmd = CMD_MOTOR_ELEV
-            current_angle = self.value_labels["elev"].angle
-            if direction == "up" and current_angle >= 90:
-                self.toast_notif.show_message("max_elev")
-                return
-            if direction == "down" and current_angle <= 0:
-                self.toast_notif.show_message("min_elev")
-                return
-        else:
-            cmd = CMD_MOTOR_AZIM
-            current_angle = self.value_labels["azim"].angle
-            if direction == "right" and current_angle >= 350:
-                self.toast_notif.show_message("max_azim")
-                return
-            if direction == "left" and current_angle <= 0:
-                self.toast_notif.show_message("min_azim")
-                return
-            
-        if direction in ["up", "right"]: dir_val = 1
-        else: dir_val = 2
+        try:
+            if direction in ["up", "down"]:
+                cmd = CMD_MOTOR_ELEV
+                current_angle = self.value_labels["elev"].angle
+                if direction == "up" and current_angle >= 90:
+                    self.toast_notif.show_message("max_elev")
+                    return
+                if direction == "down" and current_angle <= 0:
+                    self.toast_notif.show_message("min_elev")
+                    return
+            else:
+                cmd = CMD_MOTOR_AZIM
+                current_angle = self.value_labels["azim"].angle
+                if direction == "right" and current_angle >= 350:
+                    self.toast_notif.show_message("max_azim")
+                    return
+                if direction == "left" and current_angle <= 0:
+                    self.toast_notif.show_message("min_azim")
+                    return
+                
+            if direction in ["up", "right"]: dir_val = 1
+            else: dir_val = 2
 
-        self.send_command(cmd, dir_val, self.time_value, False)
+            self.send_command(cmd, dir_val, self.time_value, False)
+        except Exception as e:
+            print(f"Something seems to have gone wrong: {e}")
+            return None
 
     def send_command(self, cmd, direction, duration, park):
         """Send the command to the panel"""
